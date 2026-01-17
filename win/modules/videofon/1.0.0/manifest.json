@@ -1,0 +1,12 @@
+{
+    "id": "videofon",
+    "name": "Ad-Jukebox",
+    "version": "1.0.0",
+    "entry": "index.html",
+    "window": {
+        "width": 1280,
+        "height": 720,
+        "title": "Ad-Jukebox — Заглушка",
+        "frame": false
+    }
+}

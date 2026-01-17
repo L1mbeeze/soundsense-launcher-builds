@@ -1,0 +1,21 @@
+{
+  "detector": "crepe",
+  "sensitivity": 0,
+  "smoothing": 56,
+  "smoothingEnabled": true,
+  "holdMs": 9,
+  "holdEnabled": false,
+  "maxJump": 4,
+  "jumpEnabled": false,
+  "minFreq": 150,
+  "maxFreq": 10000,
+  "freqEnabled": false,
+  "medianSize": 3,
+  "medianEnabled": true,
+  "keySize": 22,
+  "deviceId": "default",
+  "settingsOpen": true,
+  "midiScale": 1,
+  "midiTrackIndex": 0,
+  "midiTranspose": 0
+}

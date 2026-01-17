@@ -1,0 +1,351 @@
+/* Правила для performance-режима: подключается отдельно от общей верстки */
+.performance-mode .editor-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: stretch;
+  min-height: 0;
+  flex: 1;
+  height: auto;
+  min-width: auto;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.performance-mode #editorView {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.performance-mode.wide-perf .editor-body {
+  grid-template-columns: 1fr;
+}
+
+.performance-mode .panel {
+  display: none !important;
+}
+
+.performance-mode.wide-perf .panel {
+  display: none !important;
+}
+
+.performance-mode .panel-settings {
+  display: none;
+}
+
+.performance-mode .panel-status {
+  display: none;
+}
+
+.performance-mode #perfFontField {
+  display: none;
+}
+
+.performance-mode.narrow-perf .panel {
+  display: none !important;
+}
+
+.performance-mode.narrow-perf .editor-body {
+  grid-template-columns: 1fr;
+}
+
+.performance-mode .app {
+  width: 100%;
+  max-width: 100%;
+  height: calc(100vh - 88px);
+  min-height: calc(100vh - 88px);
+}
+
+body.performance-mode {
+  padding: 64px 24px 24px;
+}
+
+.performance-mode .window-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.performance-mode .perf-focus-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: none;
+  opacity: 0.35;
+  transition: opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.performance-mode.window-focused .perf-focus-indicator {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(0, 255, 166, 0.7);
+  opacity: 1;
+}
+
+.performance-mode .editor-head {
+  justify-content: center;
+  text-align: center;
+}
+
+.performance-mode .editor-meta {
+  align-items: center;
+}
+
+.performance-mode .editor-body {
+  margin-top: 8px;
+}
+
+.performance-mode .stage-grid {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  grid-template-rows: repeat(var(--grid-rows, 1), minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 10px;
+  overflow: auto;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+}
+
+.performance-mode .editor-actions,
+.performance-mode #gridModal,
+.performance-mode #btnAddButton,
+.performance-mode #btnSaveScene {
+  display: none !important;
+}
+
+.performance-mode .stage-cell__meta,
+.performance-mode .stage-type {
+  display: none;
+}
+
+.performance-mode .stage-label {
+  font-size: var(--cell-font, 16px);
+  text-align: center;
+}
+
+.performance-mode .stage-progress {
+  height: 10px;
+}
+
+.performance-mode .stage-cell__btn {
+  cursor: pointer;
+  justify-content: center;
+}
+
+.performance-mode #btnBack {
+  display: none !important;
+}
+
+.performance-mode.perf-list-mode .stage-grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: none;
+  grid-auto-rows: auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  gap: 6px;
+}
+
+.performance-mode.perf-list-mode .stage-cell {
+  width: 100%;
+  max-width: 100%;
+  min-height: auto;
+  height: auto;
+  padding: 0 4px;
+  align-items: stretch;
+}
+
+.performance-mode .stage-cell {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  position: relative;
+  overflow: hidden;
+}
+
+.performance-mode .stage-file,
+.performance-mode .file-status {
+  display: none !important;
+}
+
+.performance-mode.perf-list-mode .stage-cell__empty {
+  display: none !important;
+}
+
+.performance-mode .stage-cell__btn {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(0, 255, 166, 0.25);
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(0, 255, 166, 0.1), rgba(0, 0, 0, 0.2));
+  color: #d1d5db;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s;
+  justify-content: center;
+}
+
+.performance-mode.perf-list-mode .stage-cell__btn {
+  width: 100% !important;
+  height: auto !important;
+  min-height: auto;
+  max-height: none !important;
+  padding: 4px 8px;
+  margin: 0;
+}
+
+.performance-mode .stage-cell__btn .stage-label {
+  font-weight: 700;
+  font-size: var(--cell-font, 16px);
+  text-align: center;
+  width: 100%;
+}
+
+.performance-mode .stage-cell__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.performance-mode .stage-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.performance-mode .file-status.ok {
+  color: var(--accent);
+}
+
+.performance-mode .file-status.missing {
+  color: #ff97ad;
+}
+
+.performance-mode .stage-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 8px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.performance-mode .stage-progress__bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  transition: width 0.1s linear;
+}
+
+.performance-mode .stage-cell__btn.stage--playing {
+  box-shadow: 0 0 22px rgba(0, 255, 166, 0.55), 0 0 0 2px rgba(0, 255, 166, 0.45);
+  border-color: rgba(0, 255, 166, 0.65);
+  transform: translateY(-2px) scale(1.01);
+  position: relative;
+}
+
+.performance-mode .stage-cell__btn.stage--playing::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: 12px;
+  filter: blur(8px);
+  background: linear-gradient(
+    45deg,
+    var(--btn-color, #00ffa6),
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    var(--btn-color, #00ffa6)
+  );
+  background-size: 400% 400%;
+  animation: glowing 10s linear infinite;
+  opacity: 0.9;
+}
+
+.performance-mode .stage-cell__btn.stage--selected {
+  outline: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.performance-mode .stage-cell__btn.stage--used {
+  background: linear-gradient(145deg, rgba(20, 24, 32, 0.85), rgba(12, 14, 20, 0.9));
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #9ca3af;
+  filter: grayscale(1) brightness(0.6);
+}
+
+.performance-mode .stage-cell__btn.stage--used .stage-label {
+  color: #8b8b8b !important;
+}
+
+.performance-mode .stage-cell__btn.stage--used.stage--playing {
+  filter: none;
+  background: linear-gradient(145deg, var(--btn-color, #00ffa6), rgba(0, 0, 0, 0.25));
+  border-color: rgba(0, 255, 166, 0.25);
+  color: #d1d5db;
+}
+
+.performance-mode .stage-cell__btn.stage--used.stage--playing .stage-label {
+  color: #ffffff !important;
+}
+
+.performance-mode .stage-cell__btn:not(.stage--selected) {
+  opacity: 1;
+}
+
+.performance-mode:not(.perf-list-mode) .stage-cell__empty {
+  display: block !important;
+}
+
+.performance-mode.narrow-perf .floating-playing {
+  display: none;
+}
+
+.performance-mode.perf-list-mode .floating-playing {
+  display: none;
+}
+
+.performance-mode .floating-playing {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .performance-mode .editor-body {
+    grid-template-columns: 1fr;
+  }
+
+  .performance-mode .panel {
+    display: none;
+  }
+}

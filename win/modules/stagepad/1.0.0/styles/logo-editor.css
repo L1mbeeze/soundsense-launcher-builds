@@ -1,0 +1,597 @@
+body[data-page="logo-editor"] .logo-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+}
+
+body[data-page="logo-editor"] .logo-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+body[data-page="logo-editor"] .logo-editor__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+body[data-page="logo-editor"] .logo-editor__meta h1 {
+  margin: 0;
+}
+
+body[data-page="logo-editor"] .logo-editor__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  min-height: 0;
+  flex: 1;
+}
+
+body[data-page="logo-editor"] .logo-workspace {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: var(--stagepad-cover-aspect, 16 / 9);
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+body[data-page="logo-editor"] .logo-workspace__markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    linear-gradient(
+      to right,
+      transparent calc(50% - 1px),
+      rgba(255, 255, 255, 0.12) calc(50% - 1px),
+      rgba(255, 255, 255, 0.12) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(50% - 1px),
+      rgba(255, 255, 255, 0.12) calc(50% - 1px),
+      rgba(255, 255, 255, 0.12) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    );
+  opacity: 0.35;
+}
+
+body[data-page="logo-editor"] .logo-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+body[data-page="logo-editor"] .logo-workspace__layers {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+body[data-page="logo-editor"] .logo-workspace__placeholder {
+  text-align: center;
+  max-width: 420px;
+  padding: 24px;
+  color: var(--muted);
+}
+
+body[data-page="logo-editor"] .logo-workspace__title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: var(--text);
+}
+
+body[data-page="logo-editor"] .logo-panel {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+body[data-page="logo-editor"] .logo-panel > * {
+  flex-shrink: 0;
+}
+
+body[data-page="logo-editor"] .logo-panel h3 {
+  margin: 0;
+}
+
+body[data-page="logo-editor"] .logo-project-chip {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+body[data-page="logo-editor"] .logo-panel__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+body[data-page="logo-editor"] .logo-workspace[data-has-image="true"] .logo-workspace__placeholder {
+  display: none;
+}
+
+body[data-page="logo-editor"] .logo-layer-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%;
+  max-height: 100%;
+  user-select: none;
+  cursor: grab;
+}
+
+body[data-page="logo-editor"] .logo-layer-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  cursor: grab;
+}
+
+body[data-page="logo-editor"] .logo-layer-text svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-shadow-dance {
+  display: inline-block;
+  white-space: pre;
+  --shadow-a: #ff005e;
+  --shadow-b: #00d4ff;
+  --effect-speed: 2s;
+  animation: shadow-dance var(--effect-speed) infinite;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-melting {
+  display: inline-block;
+  white-space: pre;
+  font-weight: 700;
+  text-transform: uppercase;
+  --melt-a: #ff6f61;
+  --melt-b: #ffbd44;
+  --effect-speed: 3s;
+  background: linear-gradient(90deg, var(--melt-a), var(--melt-b), var(--melt-a));
+  -webkit-background-clip: text;
+  color: transparent;
+  position: relative;
+  animation: melt var(--effect-speed) infinite ease-in-out;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-melting::before,
+body[data-page="logo-editor"] .logo-layer-text .text-effect-melting::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--melt-a), var(--melt-b), var(--melt-a));
+  -webkit-background-clip: text;
+  color: transparent;
+  z-index: -1;
+  transform: scaleY(1);
+  opacity: 0.5;
+  animation: drip var(--effect-speed) infinite ease-in-out;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-melting::after {
+  filter: blur(10px);
+  opacity: 0.3;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-matrix {
+  display: inline-block;
+  position: relative;
+  white-space: pre;
+  --matrix-color: #00ff66;
+  --matrix-glow: #00ff66;
+  --matrix-rain: rgba(0, 255, 0, 0.2);
+  --effect-speed: 2s;
+  --rain-speed: 10s;
+  color: var(--matrix-color);
+  text-shadow: 0 0 10px var(--matrix-glow), 0 0 20px var(--matrix-glow), 0 0 30px var(--matrix-glow);
+  font-family: "Consolas", "Courier New", monospace;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-matrix::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  animation: glitch var(--effect-speed) infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  transform: translate(-2px, -2px);
+  color: var(--matrix-color);
+  text-shadow: 0 0 5px var(--matrix-glow), 0 0 15px var(--matrix-glow);
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-masked {
+  display: inline-block;
+  white-space: pre;
+  font-weight: 700;
+  text-transform: uppercase;
+  --mask-image: url("../image.avif");
+  --mask-a: #ff6f61;
+  --mask-b: #ffbd44;
+  --effect-speed: 5s;
+  background-image: var(--mask-image, linear-gradient(90deg, var(--mask-a), var(--mask-b), var(--mask-a)));
+  background-size: 200%;
+  background-position: 0 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: animate-background var(--effect-speed) infinite alternate linear;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-spin {
+  display: inline-block;
+  white-space: pre;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--spin-base, #ffffff);
+  text-shadow:
+    1px 1px 0 var(--spin-1, #e63946),
+    2px 2px 0 var(--spin-2, #f77f00),
+    3px 3px 0 var(--spin-3, #fcbf49),
+    4px 4px 0 var(--spin-4, #a8dadc),
+    5px 5px 0 var(--spin-5, #457b9d);
+  transform-style: preserve-3d;
+  animation: spin-3d var(--effect-speed, 4s) infinite linear;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-neon {
+  display: inline-block;
+  white-space: pre;
+  color: var(--neon-base, #ffffff);
+  --neon-a: #ff005e;
+  --neon-b: #00d4ff;
+  --effect-speed: 1.5s;
+  text-shadow:
+    0 0 5px var(--neon-a),
+    0 0 10px var(--neon-a),
+    0 0 20px var(--neon-a),
+    0 0 40px var(--neon-a),
+    0 0 80px var(--neon-a);
+  animation: glow var(--effect-speed) infinite alternate;
+}
+
+body[data-page="logo-editor"] .logo-layer-text .text-effect-follow {
+  display: inline-block;
+  white-space: pre;
+  color: var(--follow-base, #ffffff);
+  --follow-a: #e30613;
+  --follow-b: #009fe3;
+  --follow-c: #ffed00;
+  --follow-x1: 0px;
+  --follow-y1: 0px;
+  --follow-x2: 0px;
+  --follow-y2: 0px;
+  --follow-x3: 0px;
+  --follow-y3: 0px;
+  text-shadow:
+    var(--follow-y1) var(--follow-x1) var(--follow-a),
+    var(--follow-y2) var(--follow-x2) var(--follow-c),
+    var(--follow-x3) var(--follow-y3) var(--follow-b);
+}
+
+body[data-page="logo-editor"] .logo-layer-text .matrix-rain {
+  position: absolute;
+  inset: -200% 0 0 0;
+  background: repeating-linear-gradient(
+    0deg,
+    var(--matrix-rain) 0,
+    var(--matrix-rain) 2px,
+    transparent 4px
+  );
+  animation: rain var(--rain-speed) linear infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes shadow-dance {
+  0%, 100% {
+    text-shadow: 5px 5px 0 #ff005e, 10px 10px 0 #00d4ff;
+  }
+  50% {
+    text-shadow: -5px -5px 0 #00d4ff, -10px -10px 0 #ff005e;
+  }
+}
+
+@keyframes melt {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(20px);
+  }
+}
+
+@keyframes drip {
+  0%, 100% {
+    transform: scaleY(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1.5);
+    opacity: 0.7;
+  }
+}
+
+@keyframes rain {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(50%);
+  }
+}
+
+@keyframes glitch {
+  0%, 100% {
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    transform: translate(0);
+  }
+  33% {
+    clip-path: polygon(0 0, 100% 0, 100% 15%, 0 15%);
+    transform: translate(-5px, -5px);
+  }
+  66% {
+    clip-path: polygon(0 85%, 100% 85%, 100% 100%, 0 100%);
+    transform: translate(5px, 5px);
+  }
+}
+
+@keyframes animate-background {
+  0% {
+    background-position: 0 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes spin-3d {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes glow {
+  0% {
+    text-shadow:
+      0 0 5px var(--neon-a),
+      0 0 10px var(--neon-a),
+      0 0 20px var(--neon-a),
+      0 0 40px var(--neon-a),
+      0 0 80px var(--neon-a);
+  }
+  100% {
+    text-shadow:
+      0 0 10px var(--neon-b),
+      0 0 20px var(--neon-b),
+      0 0 40px var(--neon-b),
+      0 0 80px var(--neon-b),
+      0 0 160px var(--neon-b);
+  }
+}
+
+body[data-page="logo-editor"] .logo-layer-image.is-dragging {
+  cursor: grabbing;
+}
+
+body[data-page="logo-editor"] .logo-layer-text.is-dragging {
+  cursor: grabbing;
+}
+
+body[data-page="logo-editor"] .logo-layer-image.is-selected {
+  outline: 2px solid rgba(0, 255, 166, 0.6);
+  outline-offset: 2px;
+}
+
+body[data-page="logo-editor"] .logo-layer-text.is-selected {
+  outline: 2px solid rgba(0, 255, 166, 0.6);
+  outline-offset: 2px;
+}
+
+body[data-page="logo-editor"] .logo-guide {
+  position: absolute;
+  background: rgba(0, 255, 166, 0.35);
+  pointer-events: auto;
+}
+
+body[data-page="logo-editor"] .logo-guide--v {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  cursor: ew-resize;
+}
+
+body[data-page="logo-editor"] .logo-guide--h {
+  left: 0;
+  right: 0;
+  height: 2px;
+  cursor: ns-resize;
+}
+
+body[data-page="logo-editor"] .logo-section {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+body[data-page="logo-editor"] .logo-section__toggle {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+body[data-page="logo-editor"] .logo-section__chevron {
+  transition: transform 0.2s ease;
+}
+
+body[data-page="logo-editor"] .logo-section__toggle[aria-expanded="false"] .logo-section__chevron {
+  transform: rotate(-90deg);
+}
+
+body[data-page="logo-editor"] .logo-section__body {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: none;
+}
+
+body[data-page="logo-editor"] .logo-layer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: none;
+  overflow: visible;
+}
+
+body[data-page="logo-editor"] .logo-layer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: grab;
+}
+
+body[data-page="logo-editor"] .logo-layer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+body[data-page="logo-editor"] .logo-layer-item.is-selected {
+  border-color: rgba(0, 255, 166, 0.6);
+  box-shadow: 0 0 0 1px rgba(0, 255, 166, 0.35);
+}
+
+body[data-page="logo-editor"] .logo-layer-title {
+  font-size: 13px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-page="logo-editor"] .logo-layer-name-input {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 13px;
+}
+
+body[data-page="logo-editor"] .logo-layer-file {
+  font-size: 12px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-page="logo-editor"] .logo-layer-actions {
+  display: flex;
+  gap: 6px;
+}
+
+body[data-page="logo-editor"] .logo-layer-actions .btn {
+  margin: 0;
+}
+
+body[data-page="logo-editor"] .logo-layer-item.is-dragging {
+  opacity: 0.6;
+}
+
+body[data-page="logo-editor"] .logo-scale-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+body[data-page="logo-editor"] .logo-size-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+body[data-page="logo-editor"] .logo-size-row .btn {
+  margin: 0;
+  white-space: nowrap;
+}
+
+body[data-page="logo-editor"] .logo-text-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+body[data-page="logo-editor"] .logo-text-settings h4 {
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  body[data-page="logo-editor"] .logo-editor__body {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="logo-editor"] .logo-panel {
+    order: 2;
+  }
+}

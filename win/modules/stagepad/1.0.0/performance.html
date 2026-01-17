@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>StagePad — Перфоманс</title>
+  <link rel="stylesheet" href="styles/palette.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/editor.css">
+  <link rel="stylesheet" href="styles/waveform.css">
+  <link rel="stylesheet" href="styles/import.css">
+  <link rel="stylesheet" href="styles/performance.css">
+  <link rel="stylesheet" href="styles/perf-modal.css">
+</head>
+<body class="performance-mode" data-page="performance">
+  <div class="titlebar">
+    <div class="window-title">
+      <span class="perf-focus-indicator" aria-hidden="true"></span>
+      StagePad — Перфоманс
+    </div>
+    <div class="window-controls">
+      <button class="window-btn" data-window-action="minimize" title="Свернуть">─</button>
+      <button class="window-btn" data-window-action="toggle-maximize" title="Развернуть">□</button>
+      <button class="window-btn close" data-window-action="close" title="Закрыть">✕</button>
+    </div>
+  </div>
+  <div class="app views">
+    <div id="editorView" class="view">
+      <div class="editor-head">
+        <div class="inline">
+          <button class="btn ghost small" id="btnBack">← Назад</button>
+          <div class="editor-meta">
+            <div class="badge">Перфоманс</div>
+            <h2 id="editorTitle">Сцена</h2>
+            <p id="editorSubtitle"></p>
+          </div>
+        </div>
+        <div class="editor-actions">
+          <button class="btn secondary" id="btnAddButton">Добавить кнопку</button>
+          <button class="btn ghost" id="btnTemplates">Шаблоны</button>
+          <button class="btn ghost" id="btnStopAll">Остановить все</button>
+          <button class="btn" id="btnSaveScene">Сохранить сцену</button>
+        </div>
+      </div>
+      <div class="editor-body">
+        <div class="stage-grid" id="stageGrid"></div>
+        <div class="panel">
+          <div class="panel-settings">
+            <div class="inline" style="justify-content: space-between;">
+              <h3>Свойства</h3>
+              <span class="chip" id="slotLabel">Слот —</span>
+            </div>
+            <div class="field">
+              <label for="btnLabel">Текст кнопки</label>
+              <input type="text" id="btnLabel" placeholder="Музыка 1">
+            </div>
+            <div class="field">
+              <label for="btnColor">Цвет кнопки</label>
+              <div class="color-row">
+                <button class="btn small secondary" id="btnCopyColor">C</button>
+                <button class="btn small secondary" id="btnPasteColor">P</button>
+                <input type="color" id="btnColor" value="#00ffa6">
+                <span class="chip" id="btnColorValue">#00ffa6</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="btnType">Тип звука</label>
+              <select id="btnType">
+                <option value="music">Музыка</option>
+                <option value="fx">Эффект</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="btnPlayMode">Тип воспроизведения</label>
+              <select id="btnPlayMode">
+                <option value="solo">Соло</option>
+                <option value="playlist">Плейлист</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="btnAudioGroup">Группа громкости</label>
+                <select id="btnAudioGroup">
+                  <option value="0">Bus 1</option>
+                  <option value="1">Bus 2</option>
+                  <option value="2">Bus 3</option>
+                  <option value="3">Bus 4</option>
+                  <option value="4">Bus 5</option>
+                  <option value="5">Bus 6</option>
+                  <option value="6">Bus 7</option>
+                  <option value="7">Bus 8</option>
+                  <option value="8">FX 1</option>
+                  <option value="9">FX 2</option>
+                  <option value="10">FX 3</option>
+                  <option value="11">FX 4</option>
+                </select>
+            </div>
+            <div class="field">
+              <label class="inline">
+                <input type="checkbox" id="btnMarkUsage"> Пометка об использовании
+              </label>
+              <p class="hint">Если включено, после первого запуска кнопка станет серой.</p>
+            </div>
+            <div class="field" id="playlistFields">
+              <div class="playlist">
+                <div class="playlist__controls" id="playlistControls" hidden>
+                  <div class="field">
+                    <label for="playlistMode">Режим плейлиста</label>
+                    <select id="playlistMode">
+                      <option value="sequential">Обычный (по очереди)</option>
+                      <option value="random">Рандомный</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="repeatGap">Допустимый повтор (треков)</label>
+                    <input type="number" id="repeatGap" min="0" max="99" value="0">
+                  </div>
+                </div>
+                <div class="file-row">
+                  <button class="btn small secondary" id="btnAddTrack">Добавить трек</button>
+                </div>
+                <div class="playlist__toggle-row">
+                  <button class="btn ghost small" id="btnPlaylistExpand" aria-pressed="false">Показать весь</button>
+                </div>
+                <div class="playlist__list" id="playlistList"></div>
+                <p class="hint">Треки можно перетаскивать для изменения порядка.</p>
+              </div>
+            </div>
+            <div class="field">
+              <label for="btnOnClick">Повторный клик</label>
+              <select id="btnOnClick">
+                <option value="restart">Начать заново</option>
+                <option value="pause">Пауза / продолжить</option>
+                <option value="stop">Остановить</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="inline">
+                <input type="checkbox" id="fadeInToggle"> Фейд-ин
+              </label>
+              <div class="range-row">
+                <input type="range" id="fadeInDuration" min="0" max="5000" step="100" value="0">
+                <span id="fadeInLabel" class="chip">0 мс</span>
+              </div>
+            </div>
+            <div class="field">
+              <label class="inline">
+                <input type="checkbox" id="fadeOutToggle"> Фейд-аут
+              </label>
+              <div class="range-row">
+                <input type="range" id="fadeOutDuration" min="0" max="5000" step="100" value="0">
+                <span id="fadeOutLabel" class="chip">0 мс</span>
+              </div>
+              <p class="hint">Фейд-аут после затухания останавливает звук.</p>
+            </div>
+            <button class="btn secondary" id="btnSaveTemplate">Сохранить как шаблон</button>
+            <button class="btn danger" id="btnDeleteButtonPanel">Удалить кнопку</button>
+            <div class="error" id="propertiesError"></div>
+          </div>
+          <div class="panel-status">
+            <h4>Перфоманс</h4>
+            <div class="field" id="perfFontField">
+              <label for="perfFontSize">Размер текста кнопок</label>
+              <div class="range-row">
+                <input type="range" id="perfFontSize" min="10" max="32" step="1" value="18">
+                <span class="chip" id="perfFontValue">18 px</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Сейчас играет</label>
+              <div class="playing-list" id="playingList"></div>
+              <p class="hint">Двойной клик — фейд-аут 2с и стоп, тройной — мгновенно.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="floating-playing" id="playingFloating"></div>
+
+  <div class="modal-backdrop" id="gridModal" hidden>
+    <div class="modal">
+      <h3>Размер сетки</h3>
+      <p class="hint">Настройте количество колонок и строк, чтобы все карточки помещались в экран.</p>
+      <div class="field">
+        <label for="gridCols">Колонки</label>
+        <input type="number" id="gridCols" min="1" max="20" value="3">
+      </div>
+      <div class="field">
+        <label for="gridRows">Строки</label>
+        <input type="number" id="gridRows" min="1" max="20" value="4">
+      </div>
+      <div class="modal__notice" id="cleanupNotice" aria-live="polite"></div>
+      <div class="modal__actions modal__actions--grid">
+        <div class="modal__actions-row modal__actions-row--info">
+          <span class="hint">Удалить неиспользуемые файлы</span>
+          <button class="btn ghost" id="btnCleanupUnused">Оптимизировать</button>
+        </div>
+        <div class="modal__actions-row modal__actions-row--info">
+          <span class="hint">Упорядочить кнопки по имени</span>
+          <button class="btn ghost" id="btnSortByName">Сортировать</button>
+        </div>
+        <div class="modal__actions-row">
+          <button class="btn secondary" id="gridCancel">Отмена</button>
+          <button class="btn" id="gridSave">Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="templateSaveModal" hidden>
+    <div class="modal">
+      <h3>Сохранить как шаблон</h3>
+      <div class="field">
+        <label for="templateNameInput">Название шаблона</label>
+        <input type="text" id="templateNameInput" placeholder="Название">
+      </div>
+      <div class="error" id="templateSaveError"></div>
+      <div class="modal__actions">
+        <button class="btn secondary" id="templateSaveCancel">Отмена</button>
+        <button class="btn" id="templateSaveConfirm">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="templateListModal" hidden>
+    <div class="modal">
+      <h3>Шаблоны</h3>
+      <div class="field">
+        <div class="template-list" id="templateList"></div>
+        <div class="error" id="templateListError"></div>
+      </div>
+      <div class="modal__actions">
+        <button class="btn secondary" id="templateListCancel">Закрыть</button>
+        <button class="btn" id="templateApply" disabled>Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="leaveConfirmModal" hidden>
+    <div class="modal">
+      <h3>Выйти из редактора?</h3>
+      <p class="hint">У вас есть несохраненные изменения. Что сделать перед выходом?</p>
+      <div class="modal__actions modal__actions--stack">
+        <div class="modal__actions-row modal__actions-row--center">
+          <button class="btn" id="leaveSave">Сохранить</button>
+          <button class="btn secondary" id="leaveStay">Остаться</button>
+        </div>
+        <div class="modal__actions-row modal__actions-row--single">
+          <button class="btn danger" id="leaveDiscard">Выйти без сохранения</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="importModal" hidden>
+    <div class="modal import-modal">
+      <h3>Добавление треков в проект</h3>
+      <p class="hint">Файлы будут сохранены в папку проекта (audio/&lt;имя&gt;) или оставлены на месте.</p>
+      <div class="import-layout">
+        <div class="field">
+          <label for="importFolderInput">Папка назначения</label>
+          <div class="inline" style="gap:6px;">
+            <input type="text" id="importFolderInput" placeholder="audio">
+            <select id="importFolderSelect" aria-label="Недавние папки"></select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="importFormatSelect">Формат</label>
+          <select id="importFormatSelect">
+            <option value="wav">WAV</option>
+            <option value="flac">FLAC</option>
+            <option value="mp3">MP3</option>
+            <option value="ogg">Ogg Vorbis</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="importFormatOptions">Параметры формата</label>
+          <select id="importFormatOptions"></select>
+        </div>
+        <div class="field">
+          <label class="inline">
+            <input type="checkbox" id="importKeepOriginal"> Сохранить оригинал (без конвертации)
+          </label>
+          <label class="inline">
+            <input type="checkbox" id="importSkipProject"> Не сохранять в проект
+          </label>
+        </div>
+      </div>
+      <div class="import-list" id="importList"></div>
+      <div class="modal__actions">
+        <button class="btn secondary" data-action="import-cancel">Отмена</button>
+        <button class="btn" data-action="import-save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="importTrimModal" hidden>
+    <div class="modal import-modal">
+      <h3>Обрезка трека</h3>
+      <p id="importTrimName" class="hint">Файл</p>
+      <div class="waveform-shell">
+        <canvas id="importWaveCanvas" width="1200" height="180"></canvas>
+        <div class="wave-selection-info" id="importTrimInfo">Кликните и потяните для выбора диапазона</div>
+      </div>
+      <div class="field inline" style="justify-content: space-between;">
+        <label>Начало: <span id="importTrimStartLabel">0:00</span></label>
+        <label>Конец: <span id="importTrimEndLabel">0:00</span></label>
+        <label>Длина: <span id="importTrimLenLabel">0:00</span></label>
+      </div>
+      <div class="modal__actions">
+        <button class="btn secondary" data-action="import-trim-cancel">Отмена</button>
+        <button class="btn ghost" data-action="import-trim-play">Плей</button>
+        <button class="btn" data-action="import-trim-save">Сохранить отрезок</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="importProgressModal" hidden>
+    <div class="modal">
+      <h3>Импорт треков</h3>
+      <progress id="importProgressBar" max="100" value="0" style="width:100%"></progress>
+      <p id="importProgressText" class="hint">Подготовка…</p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop perf-font-backdrop" id="perfFontModal" hidden>
+    <div class="perf-font-modal">
+      <header class="perf-modal__header">
+        <h3>Настройки</h3>
+        <p class="perf-modal__sub">Быстрые параметры для перфоманса</p>
+      </header>
+
+      <div class="perf-modal__section">
+        <label for="perfFontModalInput">Размер текста</label>
+        <div class="range-row">
+          <input type="range" id="perfFontModalInput" min="10" max="32" step="1" value="18">
+          <span class="chip" id="perfFontModalValue">18 px</span>
+        </div>
+      </div>
+
+      <div class="perf-modal__section perf-modal__checks">
+        <label class="inline">
+          <input type="checkbox" id="perfPreloadCheckbox">
+          Включить предзагрузку файлов
+        </label>
+        <label class="inline">
+          <input type="checkbox" id="perfListCheckbox">
+          Включить принудительный режим списка
+        </label>
+        <label class="inline">
+          <input type="checkbox" id="perfAlwaysOnTop">
+          Всегда поверх других окон
+        </label>
+      </div>
+
+      <div class="perf-modal__section perf-modal__grid">
+        <div class="field">
+          <label for="perfClickMiddle">Действие колесиком (СКМ)</label>
+          <select id="perfClickMiddle">
+            <option value="restart">Начать заново</option>
+            <option value="pause">Пауза / продолжить</option>
+            <option value="stop">Остановить</option>
+            <option value="open-playlist">Открыть плейлист</option>
+          </select>
+          <p class="hint">ЛКМ всегда использует настройку кнопки из редактора.</p>
+        </div>
+        <div class="field">
+          <label for="perfClickRight">Действие правой кнопкой (ПКМ)</label>
+          <select id="perfClickRight">
+            <option value="restart">Начать заново</option>
+            <option value="pause">Пауза / продолжить</option>
+            <option value="stop">Остановить</option>
+            <option value="open-playlist">Открыть плейлист</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="perfDefaultView">Вид по умолчанию</label>
+          <select id="perfDefaultView">
+            <option value="grid">Сетка</option>
+            <option value="list">Список</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="perf-modal__section">
+        <label>Сейчас играет</label>
+        <div class="playing-modal" id="playingModalList"></div>
+      </div>
+
+      <div class="perf-modal__actions">
+        <button class="btn ghost" id="btnResetUsage">Сбросить использованные</button>
+        <button class="btn" id="perfCoverToggle">Показать обложку</button>
+        <button class="btn secondary" data-action="perf-font-close">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="playlistPickModal" hidden>
+    <div class="modal playlist-pick">
+      <div class="playlist-pick__header">
+        <div>
+          <h3 id="playlistPickTitle">Выбор трека</h3>
+          <p class="hint" id="playlistPickSubtitle">Плейлист</p>
+        </div>
+        <button class="btn ghost small" id="playlistPickClose" title="Закрыть">✕</button>
+      </div>
+      <div class="playlist-pick__list" id="playlistPickList"></div>
+    </div>
+  </div>
+
+  <div class="wave-overlay" id="wavePopover" hidden>
+    <div class="wave-overlay__backdrop"></div>
+    <div class="wave-overlay__modal">
+      <div class="waveform-shell">
+        <div class="waveform-header">
+          <div class="inline" style="justify-content: space-between; align-items: flex-start;">
+            <div class="inline">
+              <h3>Выделение отрезка трека</h3>
+              <span class="chip" id="waveButtonLabel">—</span>
+              <div class="wave-name-stack" id="waveNameStack">
+                <div class="wave-name-view" id="waveNameView">
+                  <span class="chip" id="waveTrackLabel">—</span>
+                  <button type="button" class="btn ghost icon-btn" id="waveNameEditBtn" title="Переименовать">✏️</button>
+                </div>
+                <div class="wave-name-edit" id="waveNameEdit" hidden>
+                  <input type="text" id="waveTrackNameInput" class="wave-name-input" placeholder="Имя трека">
+                  <button type="button" class="btn small success icon-btn" id="waveNameSaveBtn" title="Сохранить">✓</button>
+                  <button type="button" class="btn small secondary icon-btn" id="waveNameCancelBtn" title="Отменить">✕</button>
+                </div>
+              </div>
+              <span class="chip" id="waveTrackDuration">0:00</span>
+            </div>
+            <button class="btn danger small" id="waveCloseBtn">Закрыть</button>
+          </div>
+          <div class="inline">
+            <label class="inline">
+              <input type="checkbox" id="waveLoopToggle"> Петля
+            </label>
+            <button class="btn ghost small" id="waveNormalizeBtn">Нормализовать</button>
+            <button class="btn small" id="wavePlayBtn">▶ Плей</button>
+          </div>
+        </div>
+        <canvas id="waveCanvas" width="1200" height="160"></canvas>
+        <div class="wave-selection-info" id="waveSelectionInfo">Выберите трек и нажмите SEL, чтобы увидеть волну</div>
+        <div class="wave-normalize" id="waveNormalizeActions" hidden>
+          <div class="wave-normalize__status" id="waveNormalizeStatus">Нормализация готова.</div>
+          <div class="wave-normalize__buttons">
+            <button class="btn ghost small" id="waveNormalizePlayOriginal">Плей оригинал</button>
+            <button class="btn ghost small" id="waveNormalizePlayNormalized">Плей нормализ.</button>
+            <button class="btn small secondary" id="waveNormalizeKeepOriginal">Оставить оригинал</button>
+            <button class="btn small" id="waveNormalizeKeepNormalized">Оставить нормализ.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" accept="audio/*" multiple hidden>
+
+  <script type="module" src="scripts/page-performance.js"></script>
+</body>
+</html>

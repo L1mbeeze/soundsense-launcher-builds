@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ad-Jukebox</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg-0: #0b1016;
+        --bg-1: #0f1620;
+        --bg-2: #121c28;
+        --panel-0: rgba(12, 18, 28, 0.95);
+        --panel-1: rgba(18, 28, 40, 0.92);
+        --ink-0: #e8eef6;
+        --ink-1: #b5c1d3;
+        --muted: #7f93ab;
+        --accent: #ffb020;
+        --accent-2: #00d1a0;
+        --accent-3: #3aa6ff;
+        --danger: #ff6b8a;
+        --stroke: rgba(255, 255, 255, 0.08);
+        --glow: 0 18px 32px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        background:
+          radial-gradient(1200px 600px at 10% 0%, rgba(255, 176, 32, 0.18), transparent 60%),
+          radial-gradient(900px 500px at 85% 10%, rgba(0, 209, 160, 0.18), transparent 55%),
+          linear-gradient(160deg, #0a1018 0%, #0c121a 35%, #0f1723 100%);
+        font-family: "Bahnschrift", "Segoe UI", sans-serif;
+        color: var(--ink-0);
+        user-select: none;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::before {
+        background:
+          radial-gradient(500px 280px at 18% 78%, rgba(58, 166, 255, 0.14), transparent 65%),
+          radial-gradient(420px 260px at 85% 85%, rgba(255, 107, 138, 0.12), transparent 70%);
+        mix-blend-mode: screen;
+      }
+
+      body::after {
+        background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 0);
+        background-size: 22px 22px;
+        opacity: 0.12;
+      }
+
+      .window-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px 0 18px;
+        background: rgba(10, 14, 20, 0.75);
+        border-bottom: 1px solid var(--stroke);
+        backdrop-filter: blur(10px);
+        z-index: 10;
+        -webkit-app-region: drag;
+      }
+
+      .window-title {
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .window-controls {
+        display: flex;
+        gap: 6px;
+        -webkit-app-region: no-drag;
+      }
+
+      .window-btn {
+        width: 30px;
+        height: 22px;
+        border: none;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--ink-0);
+        cursor: pointer;
+        font-size: 13px;
+        line-height: 1;
+        transition: background 0.2s, color 0.2s;
+      }
+
+      .window-btn:hover {
+        background: rgba(0, 209, 160, 0.25);
+        color: var(--accent-2);
+      }
+
+      .window-btn.close:hover {
+        background: rgba(255, 107, 138, 0.35);
+        color: var(--danger);
+      }
+
+      .videofon-app {
+        flex: 1;
+        display: grid;
+        grid-template-columns: minmax(320px, 0.9fr) minmax(320px, 1.1fr);
+        grid-template-rows: 1fr auto;
+        gap: 22px;
+        padding: 60px 24px 24px;
+        height: 100vh;
+        position: relative;
+        z-index: 1;
+        animation: appReveal 0.5s ease;
+      }
+
+      @keyframes appReveal {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .playlist-panel {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .side-panel {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .ads-layout {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) minmax(200px, 0.9fr);
+        gap: 16px;
+        align-items: start;
+      }
+
+      .ads-column {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .ads-settings {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .panel {
+        background: linear-gradient(160deg, var(--panel-0), var(--panel-1));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-height: 0;
+        box-shadow: var(--glow);
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .panel-title {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0.2px;
+        text-transform: uppercase;
+      }
+
+      .title-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        margin-right: 8px;
+        font-size: 12px;
+        color: #0e1116;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .panel-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .ghost-btn,
+      .primary-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #0e1116;
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+      }
+
+      .ghost-btn {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--ink-0);
+      }
+
+      .ghost-btn:hover,
+      .primary-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+      }
+
+      .playlist {
+        flex: 1;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 12px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: rgba(9, 14, 20, 0.55);
+      }
+
+      .playlist-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(12, 18, 28, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        cursor: grab;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+        animation: itemRise 0.32s ease both;
+        animation-delay: calc(var(--i, 0) * 24ms);
+      }
+
+      .playlist-item:hover {
+        border-color: rgba(255, 176, 32, 0.35);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+        transform: translateY(-1px);
+      }
+
+      @keyframes itemRise {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .playlist-thumb {
+        width: 64px;
+        height: 40px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: grid;
+        place-items: center;
+        position: relative;
+      }
+
+      .playlist-thumb video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .playlist-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .playlist-thumb::after {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        font-size: 10px;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #101418;
+        background: rgba(255, 176, 32, 0.9);
+        content: "W";
+      }
+
+      .playlist-thumb[data-scale="height"]::after {
+        content: "H";
+        background: rgba(58, 166, 255, 0.85);
+      }
+
+      .playlist-thumb[data-scale="height"] img,
+      .playlist-thumb[data-scale="height"] video {
+        object-fit: contain;
+      }
+
+      .ads-row-toggle {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--ink-1);
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .ads-row-toggle.is-on {
+        border-color: rgba(0, 209, 160, 0.6);
+        color: var(--accent-2);
+      }
+
+      .ads-next-badge {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(148, 163, 184, 0.6);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+        transition: background 0.2s ease, box-shadow 0.2s ease;
+        flex-shrink: 0;
+      }
+
+      .playlist-item.is-next .ads-next-badge {
+        background: rgba(0, 209, 160, 0.95);
+        box-shadow: 0 0 10px rgba(0, 209, 160, 0.6);
+      }
+
+      .ads-master-toggle.is-on {
+        background: rgba(0, 209, 160, 0.18);
+        border-color: rgba(0, 209, 160, 0.4);
+        color: var(--accent-2);
+      }
+
+      .playlist-item.is-playing {
+        border-color: rgba(0, 209, 160, 0.6);
+        box-shadow: 0 0 18px rgba(0, 209, 160, 0.45);
+        background: rgba(12, 18, 28, 0.95);
+      }
+
+      .playlist-item.is-paused {
+        border-color: rgba(255, 176, 32, 0.7);
+        box-shadow: 0 0 16px rgba(255, 176, 32, 0.45);
+        background: rgba(12, 18, 28, 0.95);
+      }
+
+      .playlist-item.is-dragover {
+        border-color: rgba(58, 166, 255, 0.6);
+      }
+
+      .playlist-index {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--muted);
+      }
+
+      .playlist-name {
+        flex: 1;
+        font-size: 14px;
+        color: var(--ink-0);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .playlist-empty {
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+        padding: 24px;
+      }
+
+      .info-card {
+        background: rgba(8, 12, 20, 0.7);
+        border: 1px solid var(--stroke);
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .info-title {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+      }
+
+      .info-value {
+        font-size: 16px;
+        color: var(--ink-0);
+      }
+
+      .status-label {
+        font-size: 13px;
+        color: var(--ink-1);
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .transport-panel {
+        grid-column: 1 / 3;
+        grid-row: 2;
+        background: rgba(9, 14, 20, 0.85);
+        border: 1px solid var(--stroke);
+        border-radius: 18px;
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: var(--glow);
+      }
+
+      .transport-buttons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .transport-buttons button {
+        width: 44px;
+        height: 40px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(12, 18, 28, 0.8);
+        color: var(--ink-1);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 8px 16px rgba(0, 0, 0, 0.35);
+      }
+
+      .transport-buttons button:hover {
+        border-color: rgba(255, 176, 32, 0.45);
+        color: var(--accent);
+      }
+
+      .transport-buttons .is-active {
+        background: rgba(0, 209, 160, 0.22);
+        color: var(--accent-2);
+        box-shadow: 0 0 16px rgba(0, 209, 160, 0.25);
+        text-shadow: 0 0 8px rgba(0, 209, 160, 0.6);
+      }
+
+      .transport-buttons .is-flash {
+        animation: transportFlash 0.35s ease;
+      }
+
+      @keyframes transportFlash {
+        0% {
+          background: rgba(255, 107, 138, 0.18);
+          color: var(--danger);
+          box-shadow: 0 0 10px rgba(255, 107, 138, 0.25);
+        }
+        100% {
+          background: rgba(255, 255, 255, 0.06);
+          color: var(--ink-0);
+          box-shadow: none;
+        }
+      }
+      .transport-progress {
+        position: relative;
+        width: 100%;
+      }
+
+      .progress-track {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(120deg, var(--accent), var(--accent-2));
+        transition: width 0.1s ease;
+      }
+
+      .progress-hint {
+        position: absolute;
+        top: -28px;
+        transform: translateX(-50%);
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        background: rgba(6, 10, 16, 0.9);
+        border: 1px solid var(--stroke);
+        color: var(--ink-0);
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.1s ease;
+      }
+
+      .progress-hint.is-visible {
+        opacity: 1;
+      }
+
+      .progress-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .ad-timer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--stroke);
+        font-size: 15px;
+        color: var(--muted);
+      }
+
+      .ad-timer strong {
+        color: var(--ink-0);
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.5px;
+      }
+
+      .ad-timer.is-active {
+        border-color: rgba(0, 209, 160, 0.55);
+        color: var(--accent-2);
+        box-shadow: 0 0 14px rgba(0, 209, 160, 0.25);
+      }
+
+      .ad-timer.is-active strong {
+        color: var(--accent-2);
+      }
+
+      .context-menu {
+        position: fixed;
+        min-width: 160px;
+        background: linear-gradient(160deg, rgba(14, 20, 30, 0.98), rgba(12, 18, 26, 0.98));
+        border: 1px solid var(--stroke);
+        border-radius: 12px;
+        padding: 6px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        display: none;
+        z-index: 30;
+        backdrop-filter: blur(8px);
+      }
+
+      .context-menu.is-visible {
+        display: block;
+      }
+
+      .context-menu button {
+        width: 100%;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--ink-0);
+        padding: 8px 10px;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .context-menu button:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .context-menu .danger {
+        color: var(--danger);
+      }
+
+      .hint {
+        font-size: 12px;
+        color: #8ea2b4;
+      }
+
+      .settings-overlay {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(4, 6, 10, 0.7);
+        z-index: 20;
+        -webkit-app-region: no-drag;
+      }
+
+      .settings-overlay.is-visible {
+        display: flex;
+      }
+
+      #projects-modal {
+        align-items: stretch;
+        justify-content: stretch;
+      }
+
+      .settings-modal {
+        width: min(460px, 92vw);
+        background: linear-gradient(160deg, rgba(14, 20, 30, 0.96), rgba(12, 18, 28, 0.92));
+        border: 1px solid var(--stroke);
+        border-radius: 20px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        box-shadow: var(--glow);
+        backdrop-filter: blur(10px);
+      }
+
+      .settings-modal h3 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0.4px;
+      }
+
+      .settings-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--ink-1);
+      }
+
+      .settings-field select {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(8, 12, 20, 0.7);
+        border-radius: 10px;
+        padding: 8px 10px;
+        color: var(--ink-0);
+      }
+
+      .settings-field input {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(8, 12, 20, 0.7);
+        border-radius: 10px;
+        padding: 8px 10px;
+        color: var(--ink-0);
+        font-size: 13px;
+      }
+
+      .ads-input {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(8, 12, 20, 0.7);
+        border-radius: 10px;
+        padding: 8px 10px;
+        color: var(--ink-0);
+        font-size: 13px;
+        width: 100%;
+      }
+
+      .ads-input:focus {
+        outline: none;
+        border-color: rgba(0, 209, 160, 0.6);
+        box-shadow: 0 0 0 2px rgba(0, 209, 160, 0.2);
+      }
+
+      .project-select {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(8, 12, 20, 0.7);
+        border-radius: 10px;
+        padding: 8px 10px;
+        color: var(--ink-0);
+        font-size: 13px;
+        width: 100%;
+      }
+
+      .project-select:focus {
+        outline: none;
+        border-color: rgba(0, 209, 160, 0.6);
+        box-shadow: 0 0 0 2px rgba(0, 209, 160, 0.2);
+      }
+
+      .ads-cover-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .ads-cover-label {
+        flex: 1;
+        min-width: 140px;
+        font-size: 12px;
+        color: var(--muted);
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        background: rgba(8, 12, 20, 0.6);
+      }
+
+      .ads-cover-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--ink-1);
+      }
+
+      .ads-cover-toggle input {
+        accent-color: #00ffa6;
+      }
+
+      .hotkey-hint {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .settings-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .project-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .projects-screen {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(150deg, rgba(10, 16, 24, 0.96), rgba(12, 18, 28, 0.96));
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+        position: relative;
+      }
+
+      .projects-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        -webkit-app-region: drag;
+      }
+
+      .projects-header button {
+        -webkit-app-region: no-drag;
+      }
+
+      .projects-header h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .projects-body {
+        flex: 1;
+        display: grid;
+        grid-template-columns: minmax(320px, 1.4fr) minmax(260px, 0.8fr);
+        gap: 16px;
+        min-height: 0;
+      }
+
+      .project-list {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 12px;
+        background: rgba(8, 12, 20, 0.7);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+      }
+
+      .project-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(12, 18, 28, 0.9);
+        cursor: pointer;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        animation: itemRise 0.32s ease both;
+        animation-delay: calc(var(--i, 0) * 24ms);
+      }
+
+      .project-card.is-active {
+        border-color: rgba(0, 209, 160, 0.6);
+        box-shadow: 0 0 16px rgba(0, 209, 160, 0.18);
+      }
+
+      .project-card.is-selected {
+        border-color: rgba(58, 166, 255, 0.6);
+      }
+
+      .project-card-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .project-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .project-meta {
+        min-width: 0;
+      }
+
+      .project-name {
+        font-size: 14px;
+        color: var(--ink-0);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .project-date {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      .projects-side {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 14px;
+        background: rgba(8, 12, 20, 0.7);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .project-rename-overlay {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(4, 6, 10, 0.6);
+        z-index: 40;
+      }
+
+      .project-rename-overlay.is-visible {
+        display: flex;
+      }
+
+      .project-rename-card {
+        width: min(360px, 90vw);
+        background: rgba(14, 18, 28, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .media-rename-overlay {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(4, 6, 10, 0.6);
+        z-index: 30;
+        -webkit-app-region: no-drag;
+      }
+
+      .media-rename-overlay.is-visible {
+        display: flex;
+      }
+
+      @media (max-width: 940px) {
+        .videofon-app {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto auto;
+          height: auto;
+        }
+
+        .transport-panel {
+          grid-column: 1;
+          grid-row: 3;
+        }
+
+        .side-panel {
+          grid-column: 1;
+          grid-row: 2;
+        }
+
+        .playlist-panel {
+          grid-row: 1;
+        }
+
+        .ads-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="window-bar">
+      <div class="window-title">Ad-Jukebox</div>
+      <div class="window-controls">
+        <button class="window-btn" type="button" data-window-action="minimize">—</button>
+        <button class="window-btn" type="button" data-window-action="toggle-maximize">▢</button>
+        <button class="window-btn close" type="button" data-window-action="close">×</button>
+      </div>
+    </header>
+
+    <main class="videofon-app">
+      <section class="panel playlist-panel" id="playlist-panel">
+          <div class="panel-header">
+            <h2 class="panel-title"><span class="title-icon">◆</span>Основной плейлист</h2>
+            <div class="panel-actions">
+              <button class="ghost-btn" type="button" id="open-settings-btn">⚙ Настройки</button>
+              <button class="primary-btn" type="button" id="add-videos-btn">＋ Видео</button>
+            </div>
+          </div>
+          <div class="playlist" id="playlist" aria-label="Плейлист Ad-Jukebox"></div>
+          <div class="playlist-empty" id="playlist-empty">
+            Перетащите сюда видео или нажмите «Добавить видео».
+          </div>
+          <div class="hint"></div>
+        </section>
+
+      <section class="panel side-panel">
+        <div class="ads-layout">
+          <div class="ads-column">
+            <div class="panel-header">
+              <h2 class="panel-title"><span class="title-icon">▣</span>Реклама</h2>
+          <div class="panel-actions">
+            <button class="ghost-btn ads-master-toggle" type="button" id="ads-toggle-btn">▣ Реклама</button>
+                <button class="ghost-btn" type="button" id="add-ads-btn">＋ Реклама</button>
+              </div>
+            </div>
+            <div class="playlist" id="ads-playlist" aria-label="Плейлист рекламы"></div>
+            <div class="playlist-empty" id="ads-empty">
+              Перетащите сюда рекламные ролики или нажмите «Добавить видео».
+            </div>
+            <div class="hint"></div>
+          </div>
+
+          <div class="ads-settings">
+            <div class="panel-header">
+              <h2 class="panel-title"><span class="title-icon">⚙</span>Настройки рекламы</h2>
+            </div>
+            <div class="info-card">
+              <div class="info-title">Параметры</div>
+              <label class="status-label" for="ads-repeat-minutes">Время повтора (мин.)</label>
+              <input class="ads-input" id="ads-repeat-minutes" type="number" min="1" step="1" value="5" />
+              <label class="status-label" for="ads-batch-count">Количество роликов за показ</label>
+              <input class="ads-input" id="ads-batch-count" type="number" min="1" step="1" value="1" />
+              <label class="status-label" for="ads-photo-duration">Время показа фото (сек.)</label>
+              <input class="ads-input" id="ads-photo-duration" type="number" min="1" step="1" value="5" />
+              <label class="status-label" for="ads-idle-cover-pick">Пустая обложка</label>
+              <div class="ads-cover-controls">
+                <div class="ads-cover-label" id="ads-idle-cover-label">Не выбрана</div>
+                <button class="ghost-btn" type="button" id="ads-idle-cover-pick">Выбрать</button>
+                <button class="ghost-btn" type="button" id="ads-idle-cover-clear">Очистить</button>
+              </div>
+              <label class="ads-cover-toggle">
+                <input type="checkbox" id="ads-idle-cover-keep" />
+                Оставаться активной
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="transport-panel">
+        <div class="transport-buttons">
+          <button class="ghost-btn" type="button" id="play-btn" aria-label="Плей" title="Плей">▶</button>
+          <button class="ghost-btn" type="button" id="pause-btn" aria-label="Пауза" title="Пауза">⏸</button>
+          <button class="ghost-btn" type="button" id="stop-btn" aria-label="Стоп" title="Стоп">⏹</button>
+          <button class="ghost-btn" type="button" id="mode-btn" aria-label="Режим повтора" title="Режим повтора">🔁</button>
+          <button class="ghost-btn" type="button" id="open-demo-btn" aria-label="Открыть демо-экран" title="Открыть демо-экран">🖥</button>
+          <div class="ad-timer" id="ad-timer">
+            <span id="ad-timer-label">До рекламы осталось</span>
+            <strong id="ad-timer-value">—</strong>
+          </div>
+        </div>
+        <div class="transport-progress">
+          <div class="progress-hint" id="progress-hint">00:00</div>
+          <div class="progress-track" id="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+        <div class="progress-meta">
+          <span id="current-label">Ничего не запущено</span>
+          <span id="time-label">00:00 / 00:00</span>
+        </div>
+      </section>
+    </main>
+
+    <div class="settings-overlay" id="settings-modal">
+      <div class="settings-modal">
+        <h3>Настройки экранов</h3>
+        <div class="settings-field">
+          <label for="work-display">Рабочий экран</label>
+          <select id="work-display"></select>
+        </div>
+        <div class="settings-field">
+          <label for="demo-display">Демонстрационный экран</label>
+          <select id="demo-display"></select>
+        </div>
+        <div class="settings-field">
+          <label for="main-photo-duration">Время показа фото (сек.)</label>
+          <input class="ads-input" id="main-photo-duration" type="number" min="1" step="1" value="5" />
+        </div>
+        <div class="settings-field">
+          <label for="toggle-hotkey">Горячая клавиша демо-экрана</label>
+          <input id="toggle-hotkey" type="text" placeholder="Нажмите сочетание" readonly />
+          <div class="hotkey-hint">Нажмите Backspace, чтобы очистить.</div>
+        </div>
+        <div class="settings-actions">
+          <button class="ghost-btn" type="button" id="open-projects-btn">Проект</button>
+        </div>
+        <div class="settings-actions">
+          <button class="ghost-btn" type="button" id="close-settings-btn">Отмена</button>
+          <button class="primary-btn" type="button" id="save-settings-btn">Сохранить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-overlay" id="projects-modal">
+      <div class="projects-screen">
+        <div class="projects-header">
+          <h3>Проекты Ad-Jukebox</h3>
+          <button class="ghost-btn" type="button" id="close-projects-btn">Закрыть</button>
+        </div>
+        <div class="projects-body">
+          <div class="project-list" id="project-list"></div>
+          <div class="projects-side">
+            <div class="settings-field">
+              <label for="project-name">Имя нового проекта</label>
+              <input id="project-name" type="text" placeholder="Например: Магазин 1" />
+            </div>
+            <div class="project-actions">
+              <button class="ghost-btn" type="button" id="load-project-btn">Загрузить</button>
+              <button class="ghost-btn" type="button" id="delete-project-btn">Удалить</button>
+              <button class="primary-btn" type="button" id="save-project-btn">Сохранить проект</button>
+            </div>
+            <div class="hint">Выберите проект слева или сохраните текущие списки как новый.</div>
+          </div>
+        </div>
+        <div class="project-rename-overlay" id="project-rename-overlay">
+          <div class="project-rename-card">
+            <div class="info-title">Переименовать проект</div>
+            <label class="status-label" for="project-rename-input">Новое имя</label>
+            <input id="project-rename-input" type="text" class="ads-input" />
+            <div class="settings-actions">
+              <button class="ghost-btn" type="button" id="project-rename-cancel">Отмена</button>
+              <button class="primary-btn" type="button" id="project-rename-confirm">Переименовать</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="media-rename-overlay" id="media-rename-overlay">
+      <div class="project-rename-card">
+        <div class="info-title" id="media-rename-title">Переименовать</div>
+        <label class="status-label" for="media-rename-input">Новое имя</label>
+        <input id="media-rename-input" type="text" class="ads-input" />
+        <div class="settings-actions">
+          <button class="ghost-btn" type="button" id="media-rename-cancel">Отмена</button>
+          <button class="primary-btn" type="button" id="media-rename-confirm">Переименовать</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="context-menu" id="playlist-menu">
+      <button type="button" class="danger" data-action="remove">Удалить из списка</button>
+      <button type="button" data-action="rename">Переименовать</button>
+      <button type="button" data-action="play-once">Воспроизвести единажды</button>
+      <button type="button" data-action="play-loop">Воспроизвести зацикленно</button>
+      <button type="button" data-action="scale-toggle">Масштабировать по высоте</button>
+    </div>
+
+    <div class="context-menu" id="ads-menu">
+      <button type="button" class="danger" data-action="remove">Удалить из списка</button>
+      <button type="button" data-action="rename">Переименовать</button>
+      <button type="button" data-action="play-once">Воспроизвести единажды</button>
+      <button type="button" data-action="play-loop">Воспроизвести зацикленно</button>
+      <button type="button" data-action="queue-next">В очередь</button>
+      <button type="button" data-action="scale-toggle">Масштабировать по высоте</button>
+    </div>
+
+    <div class="context-menu" id="project-menu">
+      <button type="button" data-action="rename">Переименовать</button>
+    </div>
+
+    <script>
+      const state = {
+        playlist: [],
+        adsPlaylist: [],
+        adsEnabled: false,
+        adsRepeatMinutes: 5,
+        adsBatchCount: 1,
+        mainPhotoDurationSec: 5,
+        adsPhotoDurationSec: 5,
+        adsIdleCoverPath: "",
+        adsIdleCoverKind: null,
+        adsIdleCoverKeep: false,
+        adsCountdownSec: null,
+        playingAds: false,
+        adsQueue: [],
+        adsIndex: 0,
+        adsCursorId: null,
+        mainResume: null,
+        currentTime: 0,
+        pendingSeekTime: null,
+        currentIndex: -1,
+        playing: false,
+        paused: false,
+        demoOpen: false,
+        hotkeyActive: false,
+        demoToggleBusy: false,
+        playMode: "playlist-loop",
+        playOnceOverride: null,
+        playLoopOverride: null,
+        activeProjectId: null,
+        selectedProjectId: null,
+        projects: [],
+        renameTarget: null,
+        displays: [],
+        prefs: {
+          workDisplayId: null,
+          demoDisplayId: null,
+        },
+      };
+
+      const playlistEl = document.getElementById("playlist");
+      const emptyEl = document.getElementById("playlist-empty");
+      const adsPlaylistEl = document.getElementById("ads-playlist");
+      const adsEmptyEl = document.getElementById("ads-empty");
+      const currentLabel = document.getElementById("current-label");
+      const addBtn = document.getElementById("add-videos-btn");
+      const addAdsBtn = document.getElementById("add-ads-btn");
+      const adsToggleBtn = document.getElementById("ads-toggle-btn");
+      const adsRepeatInput = document.getElementById("ads-repeat-minutes");
+      const adsBatchInput = document.getElementById("ads-batch-count");
+      const mainPhotoDurationInput = document.getElementById("main-photo-duration");
+      const adsPhotoDurationInput = document.getElementById("ads-photo-duration");
+      const adsIdleCoverLabel = document.getElementById("ads-idle-cover-label");
+      const adsIdleCoverPickBtn = document.getElementById("ads-idle-cover-pick");
+      const adsIdleCoverClearBtn = document.getElementById("ads-idle-cover-clear");
+      const adsIdleCoverKeepToggle = document.getElementById("ads-idle-cover-keep");
+      const playBtn = document.getElementById("play-btn");
+      const pauseBtn = document.getElementById("pause-btn");
+      const stopBtn = document.getElementById("stop-btn");
+      const modeBtn = document.getElementById("mode-btn");
+      const openDemoBtn = document.getElementById("open-demo-btn");
+      const progressTrack = document.getElementById("progress-track");
+      const progressFill = document.getElementById("progress-fill");
+      const progressHint = document.getElementById("progress-hint");
+      const timeLabel = document.getElementById("time-label");
+      const adTimerValue = document.getElementById("ad-timer-value");
+      const adTimer = document.getElementById("ad-timer");
+      const adTimerLabel = document.getElementById("ad-timer-label");
+      const contextMenu = document.getElementById("playlist-menu");
+      const adsMenu = document.getElementById("ads-menu");
+      const projectMenu = document.getElementById("project-menu");
+      const modal = document.getElementById("settings-modal");
+      const projectsModal = document.getElementById("projects-modal");
+      const openSettingsBtn = document.getElementById("open-settings-btn");
+      const closeSettingsBtn = document.getElementById("close-settings-btn");
+      const saveSettingsBtn = document.getElementById("save-settings-btn");
+      const openProjectsBtn = document.getElementById("open-projects-btn");
+      const closeProjectsBtn = document.getElementById("close-projects-btn");
+      const projectRenameOverlay = document.getElementById("project-rename-overlay");
+      const projectRenameInput = document.getElementById("project-rename-input");
+      const projectRenameCancel = document.getElementById("project-rename-cancel");
+      const projectRenameConfirm = document.getElementById("project-rename-confirm");
+      const mediaRenameOverlay = document.getElementById("media-rename-overlay");
+      const mediaRenameTitle = document.getElementById("media-rename-title");
+      const mediaRenameInput = document.getElementById("media-rename-input");
+      const mediaRenameCancel = document.getElementById("media-rename-cancel");
+      const mediaRenameConfirm = document.getElementById("media-rename-confirm");
+      const workSelect = document.getElementById("work-display");
+      const demoSelect = document.getElementById("demo-display");
+      const toggleHotkeyInput = document.getElementById("toggle-hotkey");
+      const projectListEl = document.getElementById("project-list");
+      const projectNameInput = document.getElementById("project-name");
+      const saveProjectBtn = document.getElementById("save-project-btn");
+      const loadProjectBtn = document.getElementById("load-project-btn");
+      const deleteProjectBtn = document.getElementById("delete-project-btn");
+      const RESERVED_KEYS = new Set(["Escape", "Esc"]);
+      let playlistRowRefs = new Map();
+      let adsRowRefs = new Map();
+
+      function updateNowPlaying() {
+        if (state.currentIndex < 0 || !state.playlist[state.currentIndex]) {
+          state.playing = false;
+          state.paused = false;
+          currentLabel.innerText = "Ничего не запущено";
+          timeLabel.innerText = "00:00 / 00:00";
+          updateTransportButtons();
+          updatePlaylistHighlight();
+          return;
+        }
+        currentLabel.innerText = state.playlist[state.currentIndex].name;
+        updateTransportButtons();
+        updatePlaylistHighlight();
+      }
+
+      function syncEmptyState() {
+        emptyEl.style.display = state.playlist.length ? "none" : "block";
+      }
+
+      function syncAdsEmptyState() {
+        adsEmptyEl.style.display = state.adsPlaylist.length ? "none" : "block";
+      }
+
+      function toFileUrl(filePath) {
+        if (!filePath) return "";
+        const normalized = filePath.replace(/\\/g, "/");
+        return `file:///${encodeURI(normalized)}`;
+      }
+
+      function getFileKind(filePath) {
+        const ext = (filePath.split(".").pop() || "").toLowerCase();
+        const imageExts = new Set(["jpg", "jpeg", "png", "webp", "avif", "gif"]);
+        return imageExts.has(ext) ? "image" : "video";
+      }
+
+      function makeId() {
+        return `${Date.now()}-${Math.random()}`;
+      }
+
+      function serializeProjectData() {
+        return {
+          playlist: state.playlist.map((item) => ({
+            id: item.id || makeId(),
+            name: item.name || "",
+            path: item.path || "",
+            kind: item.kind || getFileKind(item.path || ""),
+            scaleMode: item.scaleMode || "width",
+          })),
+          adsPlaylist: state.adsPlaylist.map((item) => ({
+            id: item.id || makeId(),
+            name: item.name || "",
+            path: item.path || "",
+            kind: item.kind || getFileKind(item.path || ""),
+            enabled: item.enabled !== false,
+            scaleMode: item.scaleMode || "width",
+          })),
+          adsEnabled: Boolean(state.adsEnabled),
+          adsRepeatMinutes: Number(state.adsRepeatMinutes) || 1,
+          adsBatchCount: Number(state.adsBatchCount) || 1,
+          mainPhotoDurationSec: Number(state.mainPhotoDurationSec) || 5,
+          adsPhotoDurationSec: Number(state.adsPhotoDurationSec) || 5,
+          playMode: state.playMode || "playlist-loop",
+          adsCursorId: state.adsCursorId || null,
+          adsIdleCoverPath: state.adsIdleCoverPath || "",
+          adsIdleCoverKind: state.adsIdleCoverKind || null,
+          adsIdleCoverKeep: Boolean(state.adsIdleCoverKeep),
+        };
+      }
+
+      function applyProjectData(data) {
+        if (!data || typeof data !== "object") return;
+        state.playlist = Array.isArray(data.playlist)
+          ? data.playlist.map((item) => ({
+              id: item.id || makeId(),
+              name: item.name || "",
+              path: item.path || "",
+              kind: item.kind || getFileKind(item.path || ""),
+              scaleMode: item.scaleMode || "width",
+            }))
+          : [];
+        state.adsPlaylist = Array.isArray(data.adsPlaylist)
+          ? data.adsPlaylist.map((item) => ({
+              id: item.id || makeId(),
+              name: item.name || "",
+              path: item.path || "",
+              kind: item.kind || getFileKind(item.path || ""),
+              enabled: item.enabled !== false,
+              scaleMode: item.scaleMode || "width",
+            }))
+          : [];
+        state.adsEnabled = Boolean(data.adsEnabled);
+        state.adsRepeatMinutes = Number(data.adsRepeatMinutes) || state.adsRepeatMinutes;
+        state.adsBatchCount = Number(data.adsBatchCount) || state.adsBatchCount;
+        state.mainPhotoDurationSec = Number(data.mainPhotoDurationSec) || state.mainPhotoDurationSec;
+        state.adsPhotoDurationSec = Number(data.adsPhotoDurationSec) || state.adsPhotoDurationSec;
+        state.playMode = data.playMode || state.playMode;
+        state.adsCursorId = data.adsCursorId || null;
+        state.adsIdleCoverPath = data.adsIdleCoverPath || "";
+        state.adsIdleCoverKind = data.adsIdleCoverKind || null;
+        state.adsIdleCoverKeep = Boolean(data.adsIdleCoverKeep);
+        state.currentIndex = state.playlist.length ? 0 : -1;
+        state.playing = false;
+        state.paused = false;
+        state.playingAds = false;
+        state.currentTime = 0;
+        state.adsCountdownSec = null;
+        state.adsQueue = null;
+        state.adsIndex = 0;
+        state.mainResume = null;
+        state.pendingSeekTime = null;
+
+        renderPlaylist();
+        renderAdsPlaylist();
+        syncAdsCursor();
+        updateAdsHighlight();
+        updateNowPlaying();
+        updateTransportButtons();
+        updatePlayModeButton();
+        updateAdsToggleButton();
+        syncAdsRepeatInput();
+        syncAdsBatchInput();
+        syncPhotoDurations();
+        syncIdleCoverUi();
+        pushIdleCover();
+        updateAdTimerLabel();
+      }
+
+      function formatDate(value) {
+        if (!value) return "—";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "—";
+        return date.toLocaleString("ru-RU", { dateStyle: "short", timeStyle: "short" });
+      }
+
+      function renderProjectCards(projects) {
+        if (!projectListEl) return;
+        projectListEl.innerHTML = "";
+        if (!projects.length) {
+          const empty = document.createElement("div");
+          empty.className = "hint";
+          empty.innerText = "Проектов пока нет.";
+          projectListEl.appendChild(empty);
+          return;
+        }
+        projects.forEach((project) => {
+          const card = document.createElement("div");
+          card.className = "project-card";
+          card.style.setProperty("--i", String(index));
+          if (state.activeProjectId && project.id === state.activeProjectId) {
+            card.classList.add("is-active");
+          }
+          if (state.selectedProjectId && project.id === state.selectedProjectId) {
+            card.classList.add("is-selected");
+          }
+
+          const left = document.createElement("div");
+          left.className = "project-card-left";
+          const icon = document.createElement("div");
+          icon.className = "project-icon";
+          icon.innerText = "📁";
+          const meta = document.createElement("div");
+          meta.className = "project-meta";
+          const name = document.createElement("div");
+          name.className = "project-name";
+          name.innerText = project.name || project.id;
+          const date = document.createElement("div");
+          date.className = "project-date";
+          date.innerText = `Обновлено: ${formatDate(project.updatedAt || project.createdAt)}`;
+          meta.append(name, date);
+          left.append(icon, meta);
+
+          const loadBtn = document.createElement("button");
+          loadBtn.type = "button";
+          loadBtn.className = "ghost-btn";
+          loadBtn.innerText = "Загрузить";
+          loadBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            state.selectedProjectId = project.id;
+            loadSelectedProject();
+          });
+
+          card.append(left, loadBtn);
+          card.addEventListener("click", () => {
+            state.selectedProjectId = project.id;
+            renderProjectCards(state.projects);
+          });
+          card.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+            openProjectContextMenu(event.clientX, event.clientY, project.id);
+          });
+
+          projectListEl.appendChild(card);
+        });
+      }
+
+      async function refreshProjectList(selectedId) {
+        if (!window.videofonAPI?.listProjects || !projectListEl) return;
+        const projects = await window.videofonAPI.listProjects();
+        state.projects = Array.isArray(projects) ? projects : [];
+        if (selectedId) {
+          state.selectedProjectId = selectedId;
+        } else if (!state.selectedProjectId && state.projects.length) {
+          state.selectedProjectId = state.activeProjectId || state.projects[0].id;
+        }
+        renderProjectCards(state.projects);
+      }
+
+      function moveItem(fromIndex, toIndex) {
+        if (fromIndex === toIndex) return;
+        const item = state.playlist.splice(fromIndex, 1)[0];
+        state.playlist.splice(toIndex, 0, item);
+        if (state.currentIndex === fromIndex) {
+          state.currentIndex = toIndex;
+        } else if (state.currentIndex > fromIndex && state.currentIndex <= toIndex) {
+          state.currentIndex -= 1;
+        } else if (state.currentIndex < fromIndex && state.currentIndex >= toIndex) {
+          state.currentIndex += 1;
+        }
+      }
+
+      function renderPlaylist() {
+        playlistEl.innerHTML = "";
+        playlistRowRefs = new Map();
+        state.playlist.forEach((item, index) => {
+          const row = document.createElement("div");
+          row.className = "playlist-item";
+          row.draggable = true;
+          row.dataset.index = String(index);
+          row.style.setProperty("--i", String(index));
+          playlistRowRefs.set(index, row);
+
+          const indexEl = document.createElement("div");
+          indexEl.className = "playlist-index";
+          indexEl.innerText = String(index + 1);
+
+          const thumb = document.createElement("div");
+          thumb.className = "playlist-thumb";
+          thumb.dataset.scale = item.scaleMode === "height" ? "height" : "width";
+          if (item.kind === "image") {
+            const previewImg = document.createElement("img");
+            previewImg.src = toFileUrl(item.path);
+            previewImg.alt = "";
+            previewImg.loading = "lazy";
+            thumb.appendChild(previewImg);
+          } else {
+            const preview = document.createElement("video");
+            preview.preload = "metadata";
+            preview.muted = true;
+            preview.playsInline = true;
+            preview.src = toFileUrl(item.path);
+            thumb.appendChild(preview);
+          }
+
+          const nameEl = document.createElement("div");
+          nameEl.className = "playlist-name";
+          nameEl.innerText = item.name;
+
+          row.append(indexEl, thumb, nameEl);
+
+          row.addEventListener("dragstart", (event) => {
+            event.dataTransfer.setData("text/plain", String(index));
+          });
+          row.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            row.classList.add("is-dragover");
+          });
+          row.addEventListener("dragleave", () => {
+            row.classList.remove("is-dragover");
+          });
+          row.addEventListener("drop", (event) => {
+            event.preventDefault();
+            row.classList.remove("is-dragover");
+            const sourceIndex = Number(event.dataTransfer.getData("text/plain"));
+            if (!Number.isFinite(sourceIndex)) return;
+            moveItem(sourceIndex, index);
+            renderPlaylist();
+            updateNowPlaying();
+          });
+          row.addEventListener("dblclick", () => {
+            playFromIndex(index);
+          });
+          row.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+            openContextMenu(event.clientX, event.clientY, index);
+          });
+
+          playlistEl.appendChild(row);
+        });
+        syncEmptyState();
+        updatePlaylistHighlight();
+      }
+
+      function renderAdsPlaylist() {
+        adsPlaylistEl.innerHTML = "";
+        adsRowRefs = new Map();
+        state.adsPlaylist.forEach((item, index) => {
+          const row = document.createElement("div");
+          row.className = "playlist-item";
+          row.draggable = true;
+          row.dataset.index = String(index);
+          row.style.setProperty("--i", String(index));
+          adsRowRefs.set(index, row);
+
+          const indexEl = document.createElement("div");
+          indexEl.className = "playlist-index";
+          indexEl.innerText = String(index + 1);
+
+          const thumb = document.createElement("div");
+          thumb.className = "playlist-thumb";
+          thumb.dataset.scale = item.scaleMode === "height" ? "height" : "width";
+          if (item.kind === "image") {
+            const previewImg = document.createElement("img");
+            previewImg.src = toFileUrl(item.path);
+            previewImg.alt = "";
+            previewImg.loading = "lazy";
+            thumb.appendChild(previewImg);
+          } else {
+            const preview = document.createElement("video");
+            preview.preload = "metadata";
+            preview.muted = true;
+            preview.playsInline = true;
+            preview.src = toFileUrl(item.path);
+            thumb.appendChild(preview);
+          }
+
+          const nameEl = document.createElement("div");
+          nameEl.className = "playlist-name";
+          nameEl.innerText = item.name;
+
+          const nextBadge = document.createElement("div");
+          nextBadge.className = "ads-next-badge";
+
+          const toggleBtn = document.createElement("button");
+          toggleBtn.type = "button";
+          toggleBtn.className = "ads-row-toggle";
+          toggleBtn.innerText = item.enabled ? "Вкл" : "Выкл";
+          toggleBtn.classList.toggle("is-on", item.enabled);
+          toggleBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            item.enabled = !item.enabled;
+            toggleBtn.innerText = item.enabled ? "Вкл" : "Выкл";
+            toggleBtn.classList.toggle("is-on", item.enabled);
+            syncAdsCursor();
+            updateAdsHighlight();
+          });
+
+          row.append(indexEl, thumb, nameEl, nextBadge, toggleBtn);
+
+          row.addEventListener("dragstart", (event) => {
+            event.dataTransfer.setData("text/plain", String(index));
+          });
+          row.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            row.classList.add("is-dragover");
+          });
+          row.addEventListener("dragleave", () => {
+            row.classList.remove("is-dragover");
+          });
+          row.addEventListener("drop", (event) => {
+            event.preventDefault();
+            row.classList.remove("is-dragover");
+            const sourceIndex = Number(event.dataTransfer.getData("text/plain"));
+            if (!Number.isFinite(sourceIndex)) return;
+            const moved = state.adsPlaylist.splice(sourceIndex, 1)[0];
+            state.adsPlaylist.splice(index, 0, moved);
+            renderAdsPlaylist();
+          });
+          row.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+            openAdsContextMenu(event.clientX, event.clientY, index);
+          });
+          row.addEventListener("dblclick", () => {
+            startAdsPlayback(index);
+          });
+
+          adsPlaylistEl.appendChild(row);
+        });
+        syncAdsEmptyState();
+        syncAdsCursor();
+        updateAdsHighlight();
+      }
+
+      function addVideos(paths) {
+        if (!paths || !paths.length) return;
+        const items = paths.map((filePath) => {
+          const name = filePath.split(/[/\\\\]/).pop() || filePath;
+          return {
+            id: `${Date.now()}-${Math.random()}`,
+            name,
+            path: filePath,
+            kind: getFileKind(filePath),
+            scaleMode: "width",
+          };
+        });
+        state.playlist.push(...items);
+        if (state.currentIndex === -1 && state.playlist.length > 0) {
+          state.currentIndex = 0;
+        }
+        renderPlaylist();
+        updateNowPlaying();
+      }
+
+      function addAds(paths) {
+        if (!paths || !paths.length) return;
+        const items = paths.map((filePath) => {
+          const name = filePath.split(/[/\\\\]/).pop() || filePath;
+          return {
+            id: `${Date.now()}-${Math.random()}`,
+            name,
+            path: filePath,
+            kind: getFileKind(filePath),
+            enabled: true,
+            scaleMode: "width",
+          };
+        });
+        state.adsPlaylist.push(...items);
+        renderAdsPlaylist();
+        syncAdsEmptyState();
+        syncAdsCursor();
+        updateAdsHighlight();
+      }
+
+      async function pickVideos() {
+        if (!window.videofonAPI?.pickVideos) return;
+        const paths = await window.videofonAPI.pickVideos();
+        addVideos(paths);
+      }
+
+      async function pickAds() {
+        if (!window.videofonAPI?.pickVideos) return;
+        const paths = await window.videofonAPI.pickVideos();
+        addAds(paths);
+      }
+
+      function playFromIndex(index, options = {}) {
+        const item = state.playlist[index];
+        if (!item || !window.videofonAPI?.playVideo) return;
+        state.playOnceOverride = options.once ? { forAds: false } : null;
+        state.playLoopOverride = options.loop ? { forAds: false } : null;
+        state.currentIndex = index;
+        state.playing = false;
+        state.paused = false;
+        state.demoOpen = true;
+        window.videofonAPI.playVideo(item.path, {
+          kind: item.kind || "video",
+          duration: item.kind === "image" ? state.mainPhotoDurationSec : null,
+          scaleMode: item.scaleMode || "width",
+        });
+        state.playingAds = false;
+        state.pendingSeekTime = null;
+        updateDemoButton();
+        updateTransportButtons();
+        updatePlaylistHighlight();
+        updateNowPlaying();
+        ensureAdsCountdownRunning();
+      }
+
+      function playNext() {
+        if (state.playLoopOverride) {
+          if (state.playLoopOverride.forAds) {
+            if (state.playingAds && state.adsQueue?.length) {
+              playAdAt(0);
+              return;
+            }
+          } else if (state.currentIndex >= 0) {
+            playFromIndex(state.currentIndex, { loop: true });
+            return;
+          }
+          state.playLoopOverride = null;
+        }
+        if (state.playOnceOverride) {
+          const { forAds } = state.playOnceOverride;
+          state.playOnceOverride = null;
+          if (forAds) {
+            finishAdsPlayback();
+            return;
+          }
+          state.playing = false;
+          state.paused = false;
+          if (state.adsIdleCoverKeep) {
+            if (window.videofonAPI?.stopVideo) {
+              window.videofonAPI.stopVideo();
+            }
+            state.demoOpen = true;
+          } else {
+            if (window.videofonAPI?.closeDemo) {
+              window.videofonAPI.closeDemo();
+            }
+            state.demoOpen = false;
+          }
+          updateNowPlaying();
+          updateTransportButtons();
+          updateDemoButton();
+          return;
+        }
+        if (state.playingAds) {
+          playNextAd();
+          return;
+        }
+        if (state.playMode === "current-loop") {
+          if (state.currentIndex >= 0) {
+            playFromIndex(state.currentIndex);
+          }
+          return;
+        }
+        if (state.playMode === "current-once") {
+          state.playing = false;
+          state.paused = false;
+          if (state.adsIdleCoverKeep) {
+            if (window.videofonAPI?.stopVideo) {
+              window.videofonAPI.stopVideo();
+            }
+            state.demoOpen = true;
+          } else {
+            state.demoOpen = false;
+            if (window.videofonAPI?.closeDemo) {
+              window.videofonAPI.closeDemo();
+            }
+          }
+          updateNowPlaying();
+          updateTransportButtons();
+          updateDemoButton();
+          return;
+        }
+
+        const nextIndex = state.currentIndex + 1;
+        if (nextIndex >= state.playlist.length) {
+          if (state.playMode === "playlist-loop" && state.playlist.length > 0) {
+            playFromIndex(0);
+            return;
+          }
+          state.playing = false;
+          state.paused = false;
+          if (state.adsIdleCoverKeep) {
+            if (window.videofonAPI?.stopVideo) {
+              window.videofonAPI.stopVideo();
+            }
+            state.demoOpen = true;
+          } else {
+            state.demoOpen = false;
+            if (window.videofonAPI?.closeDemo) {
+              window.videofonAPI.closeDemo();
+            }
+          }
+          updateNowPlaying();
+          updateTransportButtons();
+          updateDemoButton();
+          return;
+        }
+        playFromIndex(nextIndex);
+      }
+
+      function getEnabledAds() {
+        return state.adsPlaylist
+          .map((item, index) => ({ item, index }))
+          .filter((entry) => entry.item.enabled);
+      }
+
+      function syncAdsCursor() {
+        const enabledAds = getEnabledAds();
+        if (!enabledAds.length) {
+          state.adsCursorId = null;
+          return;
+        }
+        const exists =
+          state.adsCursorId &&
+          enabledAds.some((entry) => entry.item.id === state.adsCursorId);
+        if (!exists) {
+          state.adsCursorId = enabledAds[0].item.id;
+        }
+      }
+
+      function resetAdsCountdown() {
+        if (!state.adsEnabled) {
+          state.adsCountdownSec = null;
+          updateAdTimerLabel();
+          return;
+        }
+        const minutes = Number(state.adsRepeatMinutes);
+        const seconds = Number.isFinite(minutes) && minutes > 0 ? Math.round(minutes * 60) : 0;
+        state.adsCountdownSec = seconds;
+        updateAdTimerLabel();
+      }
+
+      function ensureAdsCountdownRunning() {
+        if (!state.adsEnabled || state.playingAds) return;
+        if (state.adsCountdownSec == null) {
+          resetAdsCountdown();
+        }
+      }
+
+      function tickAdsCountdown() {
+        if (!state.adsEnabled || state.playingAds) return;
+        if (!state.playing || state.paused) return;
+        if (state.adsCountdownSec == null) {
+          resetAdsCountdown();
+          return;
+        }
+        state.adsCountdownSec = Math.max(0, state.adsCountdownSec - 1);
+        updateAdTimerLabel();
+        if (state.adsCountdownSec <= 0) {
+          startAdsPlayback();
+        }
+      }
+
+      function startAdsPlayback(preferredIndex, options = {}) {
+        if (state.playingAds) return;
+        if (options.once) {
+          state.playOnceOverride = { forAds: true };
+        } else if (state.playOnceOverride?.forAds) {
+          state.playOnceOverride = null;
+        }
+        if (options.loop) {
+          state.playLoopOverride = { forAds: true };
+        } else if (state.playLoopOverride?.forAds) {
+          state.playLoopOverride = null;
+        }
+        syncAdsCursor();
+        const enabledAds = getEnabledAds();
+        if (!enabledAds.length) {
+          resetAdsCountdown();
+          return;
+        }
+        if (state.playing || state.paused) {
+          state.mainResume = {
+            index: state.currentIndex,
+            time: state.currentTime || 0,
+          };
+        } else {
+          state.mainResume = null;
+        }
+        let startIndex = 0;
+        if (Number.isFinite(preferredIndex)) {
+          const target = state.adsPlaylist[preferredIndex];
+          const enabledIndex = target
+            ? enabledAds.findIndex((entry) => entry.item.id === target.id)
+            : -1;
+          if (enabledIndex >= 0) {
+            startIndex = enabledIndex;
+          }
+        } else if (state.adsCursorId) {
+          const cursorIndex = enabledAds.findIndex(
+            (entry) => entry.item.id === state.adsCursorId
+          );
+          if (cursorIndex >= 0) {
+            startIndex = cursorIndex;
+          }
+        }
+        if (options.loop) {
+          const loopItem = enabledAds[startIndex]?.item;
+          if (!loopItem) {
+            resetAdsCountdown();
+            return;
+          }
+          state.adsQueue = [loopItem];
+          state.adsIndex = 0;
+          state.playingAds = true;
+          state.playing = false;
+          state.paused = false;
+          updateTransportButtons();
+          updateAdTimerLabel();
+          updatePlaylistHighlight();
+          updateAdsHighlight();
+          playAdAt(0);
+          return;
+        }
+        const batchCount = options.once
+          ? 1
+          : Math.max(1, Number(state.adsBatchCount) || 1);
+        const queue = [];
+        for (let i = 0; i < Math.min(batchCount, enabledAds.length); i += 1) {
+          const entry = enabledAds[(startIndex + i) % enabledAds.length];
+          queue.push(entry.item);
+        }
+        state.adsQueue = queue;
+        state.adsIndex = 0;
+        state.playingAds = true;
+        state.playing = false;
+        state.paused = false;
+        updateTransportButtons();
+        updateAdTimerLabel();
+        updatePlaylistHighlight();
+        updateAdsHighlight();
+        if (!options.once) {
+          const nextIndex = (startIndex + queue.length) % enabledAds.length;
+          state.adsCursorId = enabledAds[nextIndex]?.item?.id || state.adsCursorId;
+        }
+        playAdAt(0);
+      }
+
+      function playAdAt(index) {
+        const item = state.adsQueue[index];
+        if (!item || !window.videofonAPI?.playVideo) {
+          finishAdsPlayback();
+          return;
+        }
+        state.adsIndex = index;
+        updateAdsHighlight();
+        window.videofonAPI.playVideo(item.path, {
+          kind: item.kind || "video",
+          duration: item.kind === "image" ? state.adsPhotoDurationSec : null,
+          scaleMode: item.scaleMode || "width",
+        });
+      }
+
+      function playNextAd() {
+        const nextIndex = state.adsIndex + 1;
+        if (nextIndex >= state.adsQueue.length) {
+          finishAdsPlayback();
+          return;
+        }
+        playAdAt(nextIndex);
+      }
+
+      function finishAdsPlayback() {
+        state.playingAds = false;
+        updateAdTimerLabel();
+        updateAdsHighlight();
+        const resume = state.mainResume;
+        state.mainResume = null;
+        if (resume && resume.index >= 0 && state.playlist[resume.index]) {
+          const item = state.playlist[resume.index];
+          state.pendingSeekTime = resume.time || 0;
+          state.currentIndex = resume.index;
+          state.demoOpen = true;
+          window.videofonAPI.playVideo(item.path, {
+            kind: item.kind || "video",
+            duration: item.kind === "image" ? state.mainPhotoDurationSec : null,
+            scaleMode: item.scaleMode || "width",
+          });
+          resetAdsCountdown();
+          updatePlaylistHighlight();
+        } else {
+          resetAdsCountdown();
+        }
+      }
+
+      function stopPlayback() {
+        state.playing = false;
+        state.paused = false;
+        state.playingAds = false;
+        state.playOnceOverride = null;
+        state.playLoopOverride = null;
+        if (window.videofonAPI?.stopVideo) {
+          window.videofonAPI.stopVideo();
+        }
+        if (state.adsIdleCoverKeep) {
+          state.demoOpen = true;
+        } else {
+          if (window.videofonAPI?.closeDemo) {
+            window.videofonAPI.closeDemo();
+          }
+          state.demoOpen = false;
+        }
+        updateProgress(0, 0);
+        timeLabel.dataset.duration = "0";
+        updateNowPlaying();
+        updatePlaylistHighlight();
+        updateAdsHighlight();
+        updateDemoButton();
+      }
+
+      function updateTransportButtons() {
+        playBtn.classList.toggle("is-active", state.playing);
+        pauseBtn.classList.toggle("is-active", state.paused);
+      }
+
+      function updatePlaylistHighlight() {
+        playlistRowRefs.forEach((row, index) => {
+          const isCurrent = !state.playingAds && index === state.currentIndex;
+          row.classList.toggle("is-playing", isCurrent && state.playing);
+          row.classList.toggle("is-paused", isCurrent && state.paused);
+        });
+      }
+
+      function updateAdsHighlight() {
+        adsRowRefs.forEach((row, index) => {
+          const item = state.adsPlaylist[index];
+          const currentId = state.adsQueue?.[state.adsIndex]?.id;
+          const isCurrent = state.playingAds && item?.id && item.id === currentId;
+          row.classList.toggle("is-playing", Boolean(isCurrent));
+          row.classList.toggle("is-paused", false);
+          const isNext =
+            !state.playingAds &&
+            state.adsCursorId &&
+            item?.id &&
+            item.id === state.adsCursorId;
+          row.classList.toggle("is-next", Boolean(isNext));
+        });
+      }
+
+      function updateAdTimerLabel() {
+        if (!adTimerValue || !adTimer || !adTimerLabel) return;
+        if (state.playingAds) {
+          adTimerLabel.innerText = "РЕКЛАМА";
+          adTimerValue.innerText = "";
+          adTimer.classList.add("is-active");
+          return;
+        }
+        adTimer.classList.remove("is-active");
+        if (!state.adsEnabled) {
+          adTimerLabel.innerText = "До рекламы осталось";
+          adTimerValue.innerText = "—";
+          return;
+        }
+        if (state.adsCountdownSec == null) {
+          adTimerLabel.innerText = "До рекламы осталось";
+          adTimerValue.innerText = "—";
+          return;
+        }
+        adTimerLabel.innerText = "До рекламы осталось";
+        const minutes = Math.floor(state.adsCountdownSec / 60);
+        const seconds = Math.floor(state.adsCountdownSec % 60);
+        adTimerValue.innerText = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      }
+
+      async function loadSelectedProject() {
+        if (!window.videofonAPI?.loadProject || !state.selectedProjectId) return;
+        const payload = await window.videofonAPI.loadProject(state.selectedProjectId);
+        if (payload?.data) {
+          applyProjectData(payload.data);
+          state.activeProjectId = payload.id || state.selectedProjectId;
+          state.selectedProjectId = payload.id || state.selectedProjectId;
+          renderProjectCards(state.projects);
+        }
+      }
+
+      function updatePlayModeButton() {
+        if (!modeBtn) return;
+        let label = "";
+        let icon = "≡⟲";
+        if (state.playMode === "current-once") {
+          label = "Текущий: 1 раз";
+          icon = "①";
+        } else if (state.playMode === "current-loop") {
+          label = "Текущий: цикл";
+          icon = "⟲";
+        } else if (state.playMode === "playlist-once") {
+          label = "Плейлист: 1 раз";
+          icon = "≡①";
+        } else {
+          label = "Плейлист: цикл";
+          icon = "≡⟲";
+        }
+        modeBtn.innerText = icon;
+        modeBtn.setAttribute("title", label);
+        modeBtn.setAttribute("aria-label", label);
+      }
+
+      function cyclePlayMode() {
+        const order = ["current-once", "current-loop", "playlist-once", "playlist-loop"];
+        const index = order.indexOf(state.playMode);
+        state.playMode = order[(index + 1) % order.length];
+        updatePlayModeButton();
+      }
+
+      function flashStopButton() {
+        stopBtn.classList.remove("is-flash");
+        void stopBtn.offsetWidth;
+        stopBtn.classList.add("is-flash");
+        setTimeout(() => stopBtn.classList.remove("is-flash"), 350);
+      }
+
+      function openContextMenu(x, y, index) {
+        if (!contextMenu) return;
+        contextMenu.dataset.index = String(index);
+        contextMenu.style.left = `${x}px`;
+        contextMenu.style.top = `${y}px`;
+        contextMenu.classList.add("is-visible");
+        const item = state.playlist[index];
+        const btn = contextMenu.querySelector("[data-action='scale-toggle']");
+        if (btn) {
+          const mode = item?.scaleMode === "height" ? "width" : "height";
+          btn.textContent =
+            mode === "height"
+              ? "Подогнать по высоте"
+              : "Подогнать по ширине";
+        }
+      }
+
+      function closeContextMenu() {
+        if (!contextMenu) return;
+        contextMenu.classList.remove("is-visible");
+        delete contextMenu.dataset.index;
+      }
+
+      function openAdsContextMenu(x, y, index) {
+        if (!adsMenu) return;
+        adsMenu.dataset.index = String(index);
+        adsMenu.style.left = `${x}px`;
+        adsMenu.style.top = `${y}px`;
+        adsMenu.classList.add("is-visible");
+        const item = state.adsPlaylist[index];
+        const btn = adsMenu.querySelector("[data-action='scale-toggle']");
+        if (btn) {
+          const mode = item?.scaleMode === "height" ? "width" : "height";
+          btn.textContent =
+            mode === "height"
+              ? "Подогнать по высоте"
+              : "Подогнать по ширине";
+        }
+      }
+
+      function closeAdsContextMenu() {
+        if (!adsMenu) return;
+        adsMenu.classList.remove("is-visible");
+        delete adsMenu.dataset.index;
+      }
+
+      function removePlaylistItem(index) {
+        const target = Number(index);
+        if (!Number.isFinite(target)) return;
+        state.playlist.splice(target, 1);
+        if (state.currentIndex === target) {
+          state.currentIndex = Math.min(target, state.playlist.length - 1);
+          if (state.currentIndex < 0) {
+            stopPlayback();
+          } else if (state.playing) {
+            playFromIndex(state.currentIndex);
+          }
+        } else if (state.currentIndex > target) {
+          state.currentIndex -= 1;
+        }
+        renderPlaylist();
+        updateNowPlaying();
+      }
+
+      function removeAdsItem(index) {
+        const target = Number(index);
+        if (!Number.isFinite(target)) return;
+        state.adsPlaylist.splice(target, 1);
+        renderAdsPlaylist();
+        syncAdsCursor();
+        updateAdsHighlight();
+      }
+
+      function updateAdsToggleButton() {
+        if (!adsToggleBtn) return;
+        adsToggleBtn.classList.toggle("is-on", state.adsEnabled);
+        adsToggleBtn.innerText = state.adsEnabled ? "▣ Реклама включена" : "▣ Реклама";
+        updateAdTimerLabel();
+      }
+
+      function syncAdsRepeatInput() {
+        if (!adsRepeatInput) return;
+        adsRepeatInput.value = String(state.adsRepeatMinutes);
+      }
+
+      function syncAdsBatchInput() {
+        if (!adsBatchInput) return;
+        adsBatchInput.value = String(state.adsBatchCount);
+      }
+
+      function syncPhotoDurations() {
+        if (mainPhotoDurationInput) {
+          mainPhotoDurationInput.value = String(state.mainPhotoDurationSec);
+        }
+        if (adsPhotoDurationInput) {
+          adsPhotoDurationInput.value = String(state.adsPhotoDurationSec);
+        }
+      }
+
+      function syncIdleCoverUi() {
+        if (!adsIdleCoverLabel) return;
+        if (state.adsIdleCoverPath) {
+          const name = state.adsIdleCoverPath.split(/[/\\\\]/).pop() || state.adsIdleCoverPath;
+          adsIdleCoverLabel.innerText = name;
+        } else {
+          adsIdleCoverLabel.innerText = "Не выбрана";
+        }
+        if (adsIdleCoverKeepToggle) {
+          adsIdleCoverKeepToggle.checked = Boolean(state.adsIdleCoverKeep);
+        }
+      }
+
+      function pushIdleCover() {
+        if (!window.videofonAPI?.setIdleCover) return;
+        if (state.adsIdleCoverPath) {
+          const kind = state.adsIdleCoverKind || getFileKind(state.adsIdleCoverPath);
+          window.videofonAPI.setIdleCover({
+            url: toFileUrl(state.adsIdleCoverPath),
+            kind,
+          });
+        } else {
+          window.videofonAPI.setIdleCover(null);
+        }
+      }
+
+      function updateDemoButton() {
+        if (!openDemoBtn) return;
+        openDemoBtn.classList.toggle("is-active", state.demoOpen);
+        const label = state.demoOpen ? "Закрыть демо-экран" : "Открыть демо-экран";
+        openDemoBtn.setAttribute("aria-label", label);
+        openDemoBtn.setAttribute("title", label);
+      }
+
+      async function toggleDemo() {
+        if (!window.videofonAPI?.toggleDemoVisibility || state.demoToggleBusy) return;
+        state.demoToggleBusy = true;
+        const wasActive = state.playing || state.paused;
+        try {
+          const isVisible = await window.videofonAPI.toggleDemoVisibility();
+          state.demoOpen = Boolean(isVisible);
+          if (wasActive) {
+            if (state.demoOpen) {
+              if (window.videofonAPI?.resumeVideo) {
+                window.videofonAPI.resumeVideo();
+              }
+              state.playing = true;
+              state.paused = false;
+            } else {
+              if (window.videofonAPI?.pauseVideo) {
+                window.videofonAPI.pauseVideo();
+              }
+              state.playing = false;
+              state.paused = true;
+            }
+            updateTransportButtons();
+          }
+          updateDemoButton();
+        } finally {
+          state.demoToggleBusy = false;
+        }
+      }
+
+      function toggleSettings(forceState) {
+        const next =
+          typeof forceState === "boolean"
+            ? forceState
+            : !modal.classList.contains("is-visible");
+        modal.classList.toggle("is-visible", next);
+      }
+
+      function toggleProjectsModal(forceState) {
+        if (!projectsModal) return;
+        const next =
+          typeof forceState === "boolean"
+            ? forceState
+            : !projectsModal.classList.contains("is-visible");
+        projectsModal.classList.toggle("is-visible", next);
+      }
+
+      function openProjectContextMenu(x, y, projectId) {
+        if (!projectMenu || !projectId) return;
+        projectMenu.dataset.id = projectId;
+        projectMenu.style.left = `${x}px`;
+        projectMenu.style.top = `${y}px`;
+        projectMenu.classList.add("is-visible");
+      }
+
+      function closeProjectContextMenu() {
+        if (!projectMenu) return;
+        projectMenu.classList.remove("is-visible");
+        delete projectMenu.dataset.id;
+      }
+
+      function openProjectRename(projectId) {
+        if (!projectRenameOverlay || !projectRenameInput || !projectId) return;
+        const current = state.projects.find((project) => project.id === projectId);
+        projectRenameOverlay.dataset.id = projectId;
+        projectRenameInput.value = current?.name || "";
+        projectRenameOverlay.classList.add("is-visible");
+        projectRenameInput.focus();
+        projectRenameInput.select();
+      }
+
+      function closeProjectRename() {
+        if (!projectRenameOverlay) return;
+        projectRenameOverlay.classList.remove("is-visible");
+        delete projectRenameOverlay.dataset.id;
+      }
+
+      function openMediaRename(kind, index) {
+        if (!mediaRenameOverlay || !mediaRenameInput || !mediaRenameTitle) return;
+        const list = kind === "ads" ? state.adsPlaylist : state.playlist;
+        const item = list[index];
+        if (!item) return;
+        state.renameTarget = { kind, index };
+        mediaRenameTitle.innerText =
+          kind === "ads" ? "Переименовать рекламу" : "Переименовать видео";
+        mediaRenameInput.value = item.name || "";
+        mediaRenameOverlay.classList.add("is-visible");
+        mediaRenameInput.focus();
+        mediaRenameInput.select();
+      }
+
+      function closeMediaRename() {
+        if (!mediaRenameOverlay) return;
+        mediaRenameOverlay.classList.remove("is-visible");
+        state.renameTarget = null;
+      }
+
+      async function refreshDisplays() {
+        if (!window.videofonAPI?.listDisplays) return;
+        const [displays, prefs] = await Promise.all([
+          window.videofonAPI.listDisplays(),
+          window.videofonAPI.getDisplayPreferences(),
+        ]);
+        state.displays = Array.isArray(displays) ? displays : [];
+        state.prefs = prefs || state.prefs;
+
+        const options = [
+          { id: "", label: "Авто" },
+          ...state.displays.map((display) => ({
+            id: String(display.id),
+            label: display.label || `Дисплей ${display.id}`,
+          })),
+        ];
+
+        workSelect.innerHTML = "";
+        demoSelect.innerHTML = "";
+        options.forEach((option) => {
+          const workOpt = document.createElement("option");
+          workOpt.value = option.id;
+          workOpt.textContent = option.label;
+          workSelect.appendChild(workOpt);
+
+          const demoOpt = document.createElement("option");
+          demoOpt.value = option.id;
+          demoOpt.textContent = option.label;
+          demoSelect.appendChild(demoOpt);
+        });
+
+        workSelect.value = state.prefs.workDisplayId || "";
+        demoSelect.value = state.prefs.demoDisplayId || "";
+        toggleHotkeyInput.value = state.prefs.toggleHotkey || "";
+      }
+
+      async function saveSettings() {
+        if (!window.videofonAPI?.saveDisplayPreferences) return;
+        const prefs = {
+          workDisplayId: workSelect.value || null,
+          demoDisplayId: demoSelect.value || null,
+          toggleHotkey: toggleHotkeyInput.value || "",
+        };
+        const saved = await window.videofonAPI.saveDisplayPreferences(prefs);
+        state.prefs = saved || prefs;
+        toggleSettings(false);
+      }
+
+      function normalizeHotkey(event) {
+        const parts = [];
+        if (event.ctrlKey) parts.push("Ctrl");
+        if (event.altKey) parts.push("Alt");
+        if (event.shiftKey) parts.push("Shift");
+        if (event.metaKey) parts.push("Meta");
+        let key = event.key || "";
+        if (key.length === 1) {
+          key = key.toUpperCase();
+        }
+        if (!key || RESERVED_KEYS.has(key)) return "";
+        if (!["CTRL", "ALT", "SHIFT", "META"].includes(key.toUpperCase())) {
+          parts.push(key);
+        }
+        return parts.join("+");
+      }
+
+      toggleHotkeyInput.addEventListener("keydown", (event) => {
+        event.preventDefault();
+        if (event.key === "Backspace") {
+          toggleHotkeyInput.value = "";
+          return;
+        }
+        const combo = normalizeHotkey(event);
+        if (!combo) return;
+        toggleHotkeyInput.value = combo;
+      });
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-window-action]");
+        if (button && window.electronAPI?.windowControls) {
+          const action = button.dataset.windowAction;
+          if (action === "minimize") window.electronAPI.windowControls.minimize();
+          if (action === "toggle-maximize") window.electronAPI.windowControls.toggleMaximize();
+          if (action === "close") window.electronAPI.windowControls.close();
+          return;
+        }
+
+        if (event.target === modal) {
+          toggleSettings(false);
+        }
+        if (event.target === projectsModal) {
+          toggleProjectsModal(false);
+        }
+
+        if (contextMenu && !contextMenu.contains(event.target)) {
+          closeContextMenu();
+        }
+        if (adsMenu && !adsMenu.contains(event.target)) {
+          closeAdsContextMenu();
+        }
+        if (projectMenu && !projectMenu.contains(event.target)) {
+          closeProjectContextMenu();
+        }
+      });
+
+      addBtn.addEventListener("click", pickVideos);
+      if (addAdsBtn) {
+        addAdsBtn.addEventListener("click", pickAds);
+      }
+      if (adsToggleBtn) {
+        adsToggleBtn.addEventListener("click", () => {
+          state.adsEnabled = !state.adsEnabled;
+          if (!state.adsEnabled) {
+            state.adsCountdownSec = null;
+          }
+          updateAdsToggleButton();
+          if (state.adsEnabled && state.playing && !state.playingAds) {
+            resetAdsCountdown();
+          }
+        });
+      }
+      if (adsRepeatInput) {
+        adsRepeatInput.addEventListener("change", () => {
+          const nextValue = Number(adsRepeatInput.value);
+          state.adsRepeatMinutes = Number.isFinite(nextValue) && nextValue > 0 ? nextValue : state.adsRepeatMinutes;
+          syncAdsRepeatInput();
+          if (state.adsEnabled && state.playing && !state.playingAds) {
+            resetAdsCountdown();
+          }
+        });
+      }
+      if (adsBatchInput) {
+        adsBatchInput.addEventListener("change", () => {
+          const nextValue = Number(adsBatchInput.value);
+          state.adsBatchCount = Number.isFinite(nextValue) && nextValue > 0 ? nextValue : state.adsBatchCount;
+          syncAdsBatchInput();
+        });
+      }
+      if (mainPhotoDurationInput) {
+        mainPhotoDurationInput.addEventListener("change", () => {
+          const nextValue = Number(mainPhotoDurationInput.value);
+          state.mainPhotoDurationSec =
+            Number.isFinite(nextValue) && nextValue > 0 ? nextValue : state.mainPhotoDurationSec;
+          mainPhotoDurationInput.value = String(state.mainPhotoDurationSec);
+        });
+      }
+      if (adsPhotoDurationInput) {
+        adsPhotoDurationInput.addEventListener("change", () => {
+          const nextValue = Number(adsPhotoDurationInput.value);
+          state.adsPhotoDurationSec =
+            Number.isFinite(nextValue) && nextValue > 0 ? nextValue : state.adsPhotoDurationSec;
+          adsPhotoDurationInput.value = String(state.adsPhotoDurationSec);
+        });
+      }
+      if (adsIdleCoverPickBtn) {
+        adsIdleCoverPickBtn.addEventListener("click", async () => {
+          if (!window.videofonAPI?.pickVideos) return;
+          const paths = await window.videofonAPI.pickVideos();
+          const filePath = Array.isArray(paths) ? paths[0] : null;
+          if (!filePath) return;
+          state.adsIdleCoverPath = filePath;
+          state.adsIdleCoverKind = getFileKind(filePath);
+          syncIdleCoverUi();
+          pushIdleCover();
+        });
+      }
+      if (adsIdleCoverClearBtn) {
+        adsIdleCoverClearBtn.addEventListener("click", () => {
+          state.adsIdleCoverPath = "";
+          state.adsIdleCoverKind = null;
+          syncIdleCoverUi();
+          pushIdleCover();
+        });
+      }
+      if (adsIdleCoverKeepToggle) {
+        adsIdleCoverKeepToggle.addEventListener("change", () => {
+          state.adsIdleCoverKeep = Boolean(adsIdleCoverKeepToggle.checked);
+        });
+      }
+      playBtn.addEventListener("click", () => {
+        if (state.currentIndex < 0 && state.playlist.length > 0) {
+          state.currentIndex = 0;
+        }
+        if (state.paused && window.videofonAPI?.resumeVideo) {
+          state.playing = false;
+          state.paused = false;
+          window.videofonAPI.resumeVideo();
+          updateTransportButtons();
+          return;
+        }
+        if (state.currentIndex >= 0 && state.playlist.length > 0) {
+          playFromIndex(state.currentIndex);
+        }
+      });
+      pauseBtn.addEventListener("click", () => {
+        state.playing = false;
+        state.paused = true;
+        if (window.videofonAPI?.pauseVideo) {
+          window.videofonAPI.pauseVideo();
+        }
+        updateTransportButtons();
+      });
+      stopBtn.addEventListener("click", () => {
+        flashStopButton();
+        stopPlayback();
+      });
+      if (modeBtn) {
+        modeBtn.addEventListener("click", cyclePlayMode);
+      }
+      openDemoBtn.addEventListener("click", toggleDemo);
+      openSettingsBtn.addEventListener("click", async () => {
+        await refreshDisplays();
+        toggleSettings(true);
+      });
+      closeSettingsBtn.addEventListener("click", () => toggleSettings(false));
+      saveSettingsBtn.addEventListener("click", saveSettings);
+      if (openProjectsBtn) {
+        openProjectsBtn.addEventListener("click", async () => {
+          await refreshProjectList(state.selectedProjectId);
+          toggleProjectsModal(true);
+        });
+      }
+      if (closeProjectsBtn) {
+        closeProjectsBtn.addEventListener("click", () => toggleProjectsModal(false));
+      }
+      if (projectRenameOverlay) {
+        projectRenameOverlay.addEventListener("click", (event) => {
+          if (event.target === projectRenameOverlay) {
+            closeProjectRename();
+          }
+        });
+      }
+      if (projectRenameCancel) {
+        projectRenameCancel.addEventListener("click", closeProjectRename);
+      }
+      if (projectRenameConfirm) {
+        projectRenameConfirm.addEventListener("click", async () => {
+          if (!projectRenameOverlay || !projectRenameInput) return;
+          const projectId = projectRenameOverlay.dataset.id;
+          const nextName = String(projectRenameInput.value || "").trim();
+          if (!projectId || !nextName) return;
+          if (!window.videofonAPI?.renameProject) return;
+          const renamed = await window.videofonAPI.renameProject(projectId, nextName);
+          if (renamed) {
+            if (state.activeProjectId === projectId) {
+              state.activeProjectId = projectId;
+            }
+            state.selectedProjectId = projectId;
+            await refreshProjectList(projectId);
+          }
+          closeProjectRename();
+        });
+      }
+      if (mediaRenameOverlay) {
+        mediaRenameOverlay.addEventListener("click", (event) => {
+          if (event.target === mediaRenameOverlay) {
+            closeMediaRename();
+          }
+        });
+      }
+      if (mediaRenameCancel) {
+        mediaRenameCancel.addEventListener("click", closeMediaRename);
+      }
+      if (mediaRenameConfirm) {
+        mediaRenameConfirm.addEventListener("click", () => {
+          if (!mediaRenameInput || !state.renameTarget) return;
+          const nextName = String(mediaRenameInput.value || "").trim();
+          if (!nextName) return;
+          const { kind, index } = state.renameTarget;
+          if (kind === "ads") {
+            const item = state.adsPlaylist[index];
+            if (item) {
+              item.name = nextName;
+              renderAdsPlaylist();
+            }
+          } else {
+            const item = state.playlist[index];
+            if (item) {
+              item.name = nextName;
+              renderPlaylist();
+              updateNowPlaying();
+            }
+          }
+          closeMediaRename();
+        });
+      }
+      if (saveProjectBtn) {
+        saveProjectBtn.addEventListener("click", async () => {
+          if (!window.videofonAPI?.saveProject) return;
+          const fallbackName = state.projects.find((project) => project.id === state.selectedProjectId)?.name || "";
+          const name = projectNameInput?.value?.trim() || fallbackName;
+          if (!name) return;
+          const saved = await window.videofonAPI.saveProject({
+            name,
+            data: serializeProjectData(),
+          });
+          if (projectNameInput) projectNameInput.value = "";
+          if (saved?.id) {
+            state.activeProjectId = saved.id;
+            state.selectedProjectId = saved.id;
+          }
+          await refreshProjectList(saved?.id);
+        });
+      }
+      if (loadProjectBtn) {
+        loadProjectBtn.addEventListener("click", () => {
+          loadSelectedProject();
+        });
+      }
+      if (deleteProjectBtn) {
+        deleteProjectBtn.addEventListener("click", async () => {
+          if (!window.videofonAPI?.deleteProject || !state.selectedProjectId) return;
+          const deleted = await window.videofonAPI.deleteProject(state.selectedProjectId);
+          if (deleted) {
+            if (state.activeProjectId === state.selectedProjectId) {
+              state.activeProjectId = null;
+            }
+            state.selectedProjectId = null;
+            await refreshProjectList("");
+          }
+        });
+      }
+
+      document.addEventListener("keydown", (event) => {
+        if (event.target === toggleHotkeyInput) return;
+        if (event.key === "Escape") {
+          if (projectRenameOverlay?.classList.contains("is-visible")) {
+            closeProjectRename();
+            return;
+          }
+          if (mediaRenameOverlay?.classList.contains("is-visible")) {
+            closeMediaRename();
+            return;
+          }
+          if (projectsModal?.classList.contains("is-visible")) {
+            toggleProjectsModal(false);
+            return;
+          }
+          if (modal.classList.contains("is-visible")) {
+            toggleSettings(false);
+          } else {
+            refreshDisplays().then(() => toggleSettings(true));
+          }
+          return;
+        }
+        const hotkey = state.prefs.toggleHotkey || "";
+        if (hotkey) {
+          const combo = normalizeHotkey(event);
+          const key = (event.key || "").toLowerCase();
+          const isModifierOnly =
+            key === "control" || key === "shift" || key === "alt" || key === "meta";
+          if (combo && combo === hotkey && !state.hotkeyActive && !isModifierOnly) {
+            event.preventDefault();
+            state.hotkeyActive = true;
+            if (openDemoBtn) {
+              openDemoBtn.click();
+            }
+          }
+        }
+      });
+
+      document.addEventListener("keyup", () => {
+        state.hotkeyActive = false;
+      });
+
+      const playlistPanel = document.getElementById("playlist-panel");
+      playlistPanel.addEventListener("dragover", (event) => {
+        if (event.dataTransfer?.types?.includes("Files")) {
+          event.preventDefault();
+        }
+      });
+      playlistPanel.addEventListener("drop", (event) => {
+        const files = Array.from(event.dataTransfer?.files || []);
+        if (!files.length) return;
+        event.preventDefault();
+        const paths = files.map((file) => file.path).filter(Boolean);
+        addVideos(paths);
+      });
+
+      adsPlaylistEl.addEventListener("dragover", (event) => {
+        if (event.dataTransfer?.types?.includes("Files")) {
+          event.preventDefault();
+        }
+      });
+      adsPlaylistEl.addEventListener("drop", (event) => {
+        const files = Array.from(event.dataTransfer?.files || []);
+        if (!files.length) return;
+        event.preventDefault();
+        const paths = files.map((file) => file.path).filter(Boolean);
+        addAds(paths);
+      });
+
+      if (window.videofonAPI?.onEnded) {
+        window.videofonAPI.onEnded(() => {
+          playNext();
+        });
+      }
+
+      function formatTime(seconds) {
+        if (!Number.isFinite(seconds) || seconds < 0) return "00:00";
+        const total = Math.floor(seconds);
+        const mins = Math.floor(total / 60);
+        const secs = total % 60;
+        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      }
+
+      function updateProgress(current, duration) {
+        const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0;
+        const safeCurrent = Number.isFinite(current) ? Math.max(0, current) : 0;
+        const ratio = safeDuration > 0 ? Math.min(1, safeCurrent / safeDuration) : 0;
+        progressFill.style.width = `${ratio * 100}%`;
+        timeLabel.innerText = `${formatTime(safeCurrent)} / ${formatTime(safeDuration)}`;
+      }
+
+      function seekToPosition(clientX) {
+        const rect = progressTrack.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+        const duration = Number(timeLabel.dataset.duration) || 0;
+        if (duration <= 0) return;
+        const target = duration * ratio;
+        if (window.videofonAPI?.seekVideo) {
+          window.videofonAPI.seekVideo(target);
+        }
+      }
+
+      progressTrack.addEventListener("mousemove", (event) => {
+        const rect = progressTrack.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+        const duration = Number(timeLabel.dataset.duration) || 0;
+        const previewTime = duration > 0 ? duration * ratio : 0;
+        progressHint.innerText = formatTime(previewTime);
+        progressHint.style.left = `${ratio * 100}%`;
+        progressHint.classList.add("is-visible");
+      });
+
+      progressTrack.addEventListener("mouseleave", () => {
+        progressHint.classList.remove("is-visible");
+      });
+
+      progressTrack.addEventListener("click", (event) => {
+        seekToPosition(event.clientX);
+      });
+
+      if (adTimer) {
+        adTimer.addEventListener("dblclick", () => {
+          if (!state.playingAds) return;
+          finishAdsPlayback();
+        });
+      }
+
+      if (contextMenu) {
+        contextMenu.addEventListener("click", (event) => {
+          const action = event.target.closest("[data-action]")?.dataset?.action;
+          if (action === "remove") {
+            removePlaylistItem(contextMenu.dataset.index);
+          } else if (action === "rename") {
+            const targetIndex = Number(contextMenu.dataset.index);
+            if (Number.isFinite(targetIndex)) {
+              openMediaRename("main", targetIndex);
+            }
+          } else if (action === "play-once") {
+            const targetIndex = Number(contextMenu.dataset.index);
+            const item = state.playlist[targetIndex];
+            if (item) {
+              playFromIndex(targetIndex, { once: true });
+            }
+          } else if (action === "play-loop") {
+            const targetIndex = Number(contextMenu.dataset.index);
+            const item = state.playlist[targetIndex];
+            if (item) {
+              playFromIndex(targetIndex, { loop: true });
+            }
+          } else if (action === "scale-toggle") {
+            const targetIndex = Number(contextMenu.dataset.index);
+            const item = state.playlist[targetIndex];
+            if (item) {
+              item.scaleMode = item.scaleMode === "height" ? "width" : "height";
+              if (!state.playingAds && targetIndex === state.currentIndex) {
+                window.videofonAPI?.setScaleMode?.(item.scaleMode);
+              }
+              renderPlaylist();
+            }
+          }
+          closeContextMenu();
+        });
+      }
+
+      if (adsMenu) {
+        adsMenu.addEventListener("click", (event) => {
+          const action = event.target.closest("[data-action]")?.dataset?.action;
+          if (action === "remove") {
+            removeAdsItem(adsMenu.dataset.index);
+          } else if (action === "rename") {
+            const targetIndex = Number(adsMenu.dataset.index);
+            if (Number.isFinite(targetIndex)) {
+              openMediaRename("ads", targetIndex);
+            }
+          } else if (action === "play-once") {
+            const targetIndex = Number(adsMenu.dataset.index);
+            const item = state.adsPlaylist[targetIndex];
+            if (item) {
+              startAdsPlayback(targetIndex, { once: true });
+            }
+          } else if (action === "play-loop") {
+            const targetIndex = Number(adsMenu.dataset.index);
+            const item = state.adsPlaylist[targetIndex];
+            if (item) {
+              startAdsPlayback(targetIndex, { loop: true });
+            }
+          } else if (action === "queue-next") {
+            const targetIndex = Number(adsMenu.dataset.index);
+            const item = state.adsPlaylist[targetIndex];
+            if (item) {
+              item.enabled = true;
+              state.adsCursorId = item.id;
+              renderAdsPlaylist();
+              syncAdsCursor();
+              updateAdsHighlight();
+            }
+          } else if (action === "scale-toggle") {
+            const targetIndex = Number(adsMenu.dataset.index);
+            const item = state.adsPlaylist[targetIndex];
+            if (item) {
+              item.scaleMode = item.scaleMode === "height" ? "width" : "height";
+              if (
+                state.playingAds &&
+                state.adsQueue?.[state.adsIndex]?.id === item.id
+              ) {
+                window.videofonAPI?.setScaleMode?.(item.scaleMode);
+              }
+              renderAdsPlaylist();
+            }
+          }
+          closeAdsContextMenu();
+        });
+      }
+
+      if (projectMenu) {
+        projectMenu.addEventListener("click", async (event) => {
+          const action = event.target.closest("[data-action]")?.dataset?.action;
+          if (action === "rename") {
+            const projectId = projectMenu.dataset.id;
+            if (!projectId) return;
+            openProjectRename(projectId);
+          }
+          closeProjectContextMenu();
+        });
+      }
+
+      if (window.videofonAPI?.onTime) {
+        window.videofonAPI.onTime((payload) => {
+          const current = Number(payload?.currentTime) || 0;
+          const duration = Number(payload?.duration) || 0;
+          state.currentTime = current;
+          timeLabel.dataset.duration = String(duration || 0);
+          updateProgress(current, duration);
+          if (duration > 0) {
+            state.paused = Boolean(payload?.paused);
+            state.playing = !state.paused;
+          } else {
+            state.playing = false;
+            state.paused = false;
+          }
+          if (state.pendingSeekTime != null && duration > 0) {
+            const seekTo = Math.max(0, Math.min(duration, state.pendingSeekTime));
+            state.pendingSeekTime = null;
+            if (window.videofonAPI?.seekVideo) {
+              window.videofonAPI.seekVideo(seekTo);
+            }
+          }
+          updateTransportButtons();
+          updatePlaylistHighlight();
+          updateAdsHighlight();
+        });
+      }
+
+      renderPlaylist();
+      renderAdsPlaylist();
+      updateNowPlaying();
+      updateDemoButton();
+      updateTransportButtons();
+      updatePlayModeButton();
+      updateAdsToggleButton();
+      syncAdsRepeatInput();
+      syncAdsBatchInput();
+      syncPhotoDurations();
+      syncIdleCoverUi();
+      pushIdleCover();
+      updateAdTimerLabel();
+      setInterval(tickAdsCountdown, 1000);
+      if (window.videofonAPI?.getDisplayPreferences) {
+        window.videofonAPI.getDisplayPreferences().then((prefs) => {
+          if (prefs) {
+            state.prefs = prefs;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

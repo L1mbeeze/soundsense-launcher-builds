@@ -1,0 +1,171 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-01-17T21:26:14.978Z",
+  "files": [
+    {
+      "file": ".runtime-exported",
+      "hash": "b57286bad344d12c7e02d1b8a042652be7e91147c306a174e20da6aa5055cde1",
+      "size": 24
+    },
+    {
+      "file": "Assets/bg1.png",
+      "hash": "95c5e024b627618bdd69c42e78520c9f36add161cc9a1772c9118de1b6f88373",
+      "size": 9079
+    },
+    {
+      "file": "Assets/bg2.png",
+      "hash": "19be0196627ff8039ebf73dbe36b246dbc479e9102d92fb780f11801ddbb5ad1",
+      "size": 8920
+    },
+    {
+      "file": "index.html",
+      "hash": "e3f2144f17e41cfac886340bcb1db16688a047cbd2a1d04235b9c85d9859be0c",
+      "size": 1400
+    },
+    {
+      "file": "main-core.js",
+      "hash": "f1a7b8fa79d0aada577b8339887c38442e560e6e997d0f45de745fe930dc455c",
+      "size": 59309
+    },
+    {
+      "file": "pages/assets/stagepad-1.svg",
+      "hash": "b48c3c92547be4c274afc1a78eef178b050616f91c6eb638fe62daec4103d2c9",
+      "size": 1307
+    },
+    {
+      "file": "pages/assets/stagepad-2.svg",
+      "hash": "1f74dfb24b53661af3b6a618b78a6dabdb2f5a798424c9b888488dcd1cc50993",
+      "size": 1244
+    },
+    {
+      "file": "pages/assets/stagepad-3.svg",
+      "hash": "767f5c35fb5e49b0dcef8c66c4d19f68a4464fc759c7d89731419e002772160d",
+      "size": 1319
+    },
+    {
+      "file": "pages/auth.html",
+      "hash": "9b8801306213d5a1f8aed556f5936799bc6daf01f252c9b27f6fb0530d0fdeee",
+      "size": 2667
+    },
+    {
+      "file": "pages/games.html",
+      "hash": "419f449b45632137250b3b37468add0d191adccf9bf45cd3b202dba7c20c31e8",
+      "size": 2139
+    },
+    {
+      "file": "pages/game_db.html",
+      "hash": "ed7b48d096ed8f2463a2ecddc95125b5f25b14b3dd72c4983a55f404c95b7e91",
+      "size": 1188
+    },
+    {
+      "file": "pages/game_fader.html",
+      "hash": "072485fd186cf877e034a9eb80e0a5864e52133ea29555eeab116f43b4cda681",
+      "size": 1194
+    },
+    {
+      "file": "pages/game_piano.html",
+      "hash": "9628adfe36039ad3eb4c337e199f3468220eaab74ecc65f4c22e0ffe538460bd",
+      "size": 1209
+    },
+    {
+      "file": "pages/game_placeholder.html",
+      "hash": "acf687ba0eb2dcb2dd49d3a88b105704948c5b355beb1b03627b0f2f96972ba5",
+      "size": 1040
+    },
+    {
+      "file": "pages/game_soundsense.html",
+      "hash": "a617b5e42fc55aa273f94249a11ae323c234eea3d1d6f7bae1ff4a40f4c279e1",
+      "size": 3041
+    },
+    {
+      "file": "pages/home.html",
+      "hash": "b1308090e364b3db1067d1cbd0de9dcb006d35fbc76cdbb6e3ea91e7fea16cc9",
+      "size": 50
+    },
+    {
+      "file": "pages/home.js",
+      "hash": "29db266e2dba4ce4eca3126b6928bf1b7af42b853b166959b8d98e847a6a3c59",
+      "size": 19155
+    },
+    {
+      "file": "pages/localserver.html",
+      "hash": "183b0599e0bd4b6b86664cc5b6e2b50936932977b20f516be4204e9e8b1598c3",
+      "size": 3619
+    },
+    {
+      "file": "pages/news.html",
+      "hash": "84d8ad5d6c9e94df29fd5ebdc105086348dfe519c21383eb2db12840095ac75f",
+      "size": 106
+    },
+    {
+      "file": "pages/profile.html",
+      "hash": "bc4f365497061fe00467c34ff1d1790c525efa38a7033c9668f01c0b69256a76",
+      "size": 3065
+    },
+    {
+      "file": "pages/profile.js",
+      "hash": "d656ece3c08326d4dc4729d95cdef33cca0d1d7f9eb03a07f589812afc41c869",
+      "size": 1968
+    },
+    {
+      "file": "pages/settings.html",
+      "hash": "abda18e8f42dbac3d11585dbffb49d99bc2c759140be059d9c7d5ea11633b2a3",
+      "size": 110
+    },
+    {
+      "file": "pages/stagepad.html",
+      "hash": "bfe72bbfe3bbff5209c61865f7915be2f0942ca5253ae19e6a63af5a40640c87",
+      "size": 4935
+    },
+    {
+      "file": "pages/stagepad.js",
+      "hash": "1b428b461152d70fea61f87ee6eded00ca6c39223d7cdb4bff784231a6a9439b",
+      "size": 1854
+    },
+    {
+      "file": "pages/videofon.html",
+      "hash": "76795d244a5666ea9700122ebd5726019a73660d13d11b5bd8450c7945e9cff4",
+      "size": 2957
+    },
+    {
+      "file": "pages/voicenote.html",
+      "hash": "02e5f7353137467a0c5b969dfc0c9bbd8ce233d87e03d57471820c67576fb031",
+      "size": 2763
+    },
+    {
+      "file": "preload.js",
+      "hash": "9fae5b666daeb5b6781e908d8d6cab6db4e2c559542f13fa734f4e728b0e857d",
+      "size": 1586
+    },
+    {
+      "file": "renderer.js",
+      "hash": "743f149f17eb4ec8342a9c6d710ae51e683c1924507b409816c78e61c18a7a81",
+      "size": 32102
+    },
+    {
+      "file": "services/localVersion.js",
+      "hash": "5782b4ed726afeb0f092f8d1eae456cb4d4975534039eebe8c801760980ada7b",
+      "size": 1146
+    },
+    {
+      "file": "services/pathUtils.js",
+      "hash": "7b18d319177d3cc4c4d03e0988752fb9ec34e6a065b28ae2f16ce8c459c9226c",
+      "size": 1157
+    },
+    {
+      "file": "services/remoteVersion.js",
+      "hash": "345f5a81f88a7dc8ee8a54161b1a4dc5b65a807ffb78e4d8175c153f73a4c8a8",
+      "size": 2327
+    },
+    {
+      "file": "services/soundSenseManager.js",
+      "hash": "96028dbf99c074068e4fed77d12113077b686678e53dc1ebea7e4e409d1a31c7",
+      "size": 17987
+    },
+    {
+      "file": "styles.css",
+      "hash": "c80817665d5e818929dd3049ee75e8ce929c0b2f2a12acf4b4ea82458a1b5d23",
+      "size": 44533
+    }
+  ]
+}

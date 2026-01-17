@@ -1,0 +1,228 @@
+.perf-font-backdrop {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(16, 20, 28, 0.9), rgba(12, 14, 20, 0.92));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  z-index: 20;
+  backdrop-filter: blur(4px);
+  }
+
+.perf-font-backdrop[hidden] {
+  display: none !important;
+}
+
+.perf-font-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 48px);
+  background: linear-gradient(160deg, rgba(19, 25, 35, 0.95), rgba(10, 12, 18, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+  padding: 18px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 420px;
+  overflow: auto;
+}
+
+.perf-font-modal h3 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+.perf-font-modal .field {
+  margin: 0;
+}
+
+.perf-font-modal .range-row {
+  align-items: center;
+}
+
+.perf-font-modal .chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.perf-modal__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.perf-modal__sub {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.perf-modal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.perf-modal__checks {
+  gap: 8px;
+}
+
+.perf-font-modal label {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.perf-modal__checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.perf-font-modal .range-row input[type="range"] {
+  width: 100%;
+  appearance: none;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  outline: none;
+}
+
+.perf-font-modal .range-row input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(35deg, var(--accent-2), var(--accent));
+  box-shadow: 0 0 12px rgba(0, 255, 166, 0.6);
+  border: none;
+}
+
+.perf-font-modal input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  appearance: none;
+  display: inline-block;
+  position: relative;
+}
+
+.perf-font-modal input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
+  border-color: rgba(0, 255, 166, 0.6);
+}
+
+.perf-font-modal input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  color: #0d0f14;
+  font-size: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+}
+
+.perf-modal__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.perf-modal__actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.perf-modal__actions .btn {
+  width: 100%;
+}
+
+.playlist-pick {
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.playlist-pick__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.playlist-pick__header .btn {
+  margin: 0;
+}
+
+.playlist-pick__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 420px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.playlist-pick__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.2));
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.playlist-pick__item:hover {
+  border-color: rgba(0, 255, 166, 0.35);
+  background: linear-gradient(145deg, rgba(0, 255, 166, 0.08), rgba(0, 0, 0, 0.2));
+  transform: translateY(-1px);
+}
+
+.playlist-pick__index {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: #9ca3af;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.playlist-pick__title {
+  flex: 1;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.playlist-pick__meta {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.playlist-pick__empty {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: #9ca3af;
+  text-align: center;
+}

@@ -1,0 +1,66 @@
+<div class="page profile-page">
+  <section class="profile-hero">
+    <div class="profile-hero__avatar">
+      <div class="profile-avatar" id="profile-avatar" aria-hidden="true">SS</div>
+      <button class="profile-avatar__edit" type="button">Сменить фото</button>
+    </div>
+    <div class="profile-hero__info">
+      <h1 class="profile-title" id="profile-title">Профиль</h1>
+      <div class="profile-status">
+        <span class="profile-status__label">Статус:</span>
+        <span class="profile-status__text" id="profile-status-text">В сети</span>
+        <button class="profile-status__edit" type="button" id="profile-status-edit" aria-label="Редактировать статус">✎</button>
+      </div>
+      <div class="profile-meta">
+        <div class="profile-meta__item">
+          <span class="profile-meta__label">Email</span>
+          <span class="profile-meta__value" id="profile-email">—</span>
+        </div>
+        <div class="profile-meta__item">
+          <span class="profile-meta__label">Статус подписки</span>
+          <span class="profile-meta__value" id="profile-subscription">Не активна</span>
+        </div>
+      </div>
+    </div>
+    <div class="profile-hero__actions">
+      <button class="profile-ghost" type="button" id="profile-logout-btn">Выйти</button>
+    </div>
+  </section>
+
+  <section class="profile-content">
+    <div class="profile-panel">
+      <div class="profile-panel__header">
+        <h2>О себе</h2>
+        <p>Описание отображается в профиле и в подборках.</p>
+      </div>
+      <label class="profile-field">
+        <span>Описание</span>
+        <textarea id="profile-bio" placeholder="Расскажите о себе, стилях и целях"></textarea>
+      </label>
+      <button class="profile-primary" type="button">Сохранить описание</button>
+    </div>
+
+    <div class="profile-panel">
+      <div class="profile-panel__header">
+        <h2>Безопасность</h2>
+        <p>Смена пароля потребует подтверждения текущего.</p>
+      </div>
+      <div class="profile-grid">
+        <label class="profile-field">
+          <span>Текущий пароль</span>
+          <input type="password" placeholder="Введите текущий пароль">
+        </label>
+        <label class="profile-field">
+          <span>Новый пароль</span>
+          <input type="password" placeholder="Минимум 8 символов">
+        </label>
+        <label class="profile-field">
+          <span>Повторите пароль</span>
+          <input type="password" placeholder="Повторите новый пароль">
+        </label>
+      </div>
+      <div class="profile-security__note">Пароль будет хэшироваться перед отправкой.</div>
+      <button class="profile-primary" type="button">Обновить пароль</button>
+    </div>
+  </section>
+</div>

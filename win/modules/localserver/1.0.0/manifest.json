@@ -1,0 +1,13 @@
+{
+    "id": "localserver",
+    "name": "Локальный сервер",
+    "version": "1.0.0",
+    "entry": "index.html",
+    "window": {
+        "width": 520,
+        "height": 560,
+        "title": "Локальный сервер",
+        "frame": true,
+        "resizable": false
+    }
+}

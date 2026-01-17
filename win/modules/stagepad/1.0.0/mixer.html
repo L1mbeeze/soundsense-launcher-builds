@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>StagePad — Микшер</title>
+
+  <link rel="stylesheet" href="styles/palette.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/mixer.css">
+</head>
+<body>
+  <div class="titlebar">
+    <div class="window-title">StagePad — Микшер</div>
+    <div class="mixer-titlebar-tools">
+      <label class="mixer-toggle" for="mixerDynamicToggle">
+        <input type="checkbox" id="mixerDynamicToggle" />
+        <span>Только используемые</span>
+      </label>
+      <label class="mixer-toggle" for="mixerCoverToggle">
+        <input type="checkbox" id="mixerCoverToggle" />
+        <span>Обложка</span>
+      </label>
+    </div>
+    <div class="window-controls">
+      <button class="window-btn" data-window-action="minimize">─</button>
+      <button class="window-btn" data-window-action="toggle-maximize">□</button>
+      <button class="window-btn close" data-window-action="close">✕</button>
+    </div>
+  </div>
+
+  <div class="mixer-shell">
+
+    <!-- 🔥 ОДИН КОНТЕЙНЕР ДЛЯ ВСЕХ ФЕЙДЕРОВ -->
+    <div class="mixer-bank">
+
+      <div class="mixer-channel" data-group="0">
+        <input class="mixer-label" type="text" value="Bus 1" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="1">
+        <input class="mixer-label" type="text" value="Bus 2" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="2">
+        <input class="mixer-label" type="text" value="Bus 3" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="3">
+        <input class="mixer-label" type="text" value="Bus 4" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="4">
+        <input class="mixer-label" type="text" value="Bus 5" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="5">
+        <input class="mixer-label" type="text" value="Bus 6" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="6">
+        <input class="mixer-label" type="text" value="Bus 7" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="7">
+        <input class="mixer-label" type="text" value="Bus 8" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="8">
+        <input class="mixer-label" type="text" value="FX 1" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="9">
+        <input class="mixer-label" type="text" value="FX 2" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="10">
+        <input class="mixer-label" type="text" value="FX 3" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+      <div class="mixer-channel" data-group="11">
+        <input class="mixer-label" type="text" value="FX 4" maxlength="24">
+        <div class="mixer-fader-wrap">
+          <input class="mixer-fader" type="range" min="0" max="1" step="0.01" value="1">
+          <span class="mixer-indicator" data-indicator aria-hidden="true"></span>
+          <div class="mixer-meter" data-meter aria-hidden="true">
+            <div class="mixer-meter__fill"></div>
+          </div>
+        </div>
+        <div class="mixer-value" data-value>-0 dB</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mixer-modal" id="channelModal" hidden>
+    <div class="mixer-modal__backdrop" data-modal-close></div>
+    <div class="mixer-modal__card" role="dialog" aria-modal="true" aria-labelledby="channelModalTitle">
+      <div class="mixer-modal__title" id="channelModalTitle">Настройки канала</div>
+      <label class="mixer-modal__field">
+        <span>Название</span>
+        <input type="text" id="channelNameInput" maxlength="24">
+      </label>
+      <label class="mixer-modal__field">
+        <span>Цвет</span>
+        <div class="mixer-color-grid" id="channelColorGrid" role="radiogroup" aria-label="Цвет канала"></div>
+      </label>
+      <div class="mixer-modal__actions">
+        <button class="btn ghost" type="button" id="channelCancelBtn">Отмена</button>
+        <button class="btn" type="button" id="channelSaveBtn">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="scripts/page-mixer.js"></script>
+</body>
+</html>

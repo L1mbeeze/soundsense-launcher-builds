@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Локальный сервер</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 15% 20%, rgba(250, 204, 21, 0.18), transparent 45%),
+        linear-gradient(140deg, rgba(10, 14, 22, 0.95), rgba(20, 30, 48, 0.92));
+      color: #e2e8f0;
+      height: 100vh;
+      display: flex;
+    }
+    .card {
+      width: 100%;
+      height: 100%;
+      padding: 22px;
+      border-radius: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #fca5a5;
+    }
+    .status.is-running {
+      color: #86efac;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+    .desc {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+    .info {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+    }
+    .info span {
+      display: block;
+      font-size: 14px;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #e2e8f0;
+      margin-top: 4px;
+    }
+    .urls {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: #cbd5e1;
+      word-break: break-all;
+    }
+    .url-item {
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .qr {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .qr[hidden] {
+      display: none;
+    }
+    .qr img {
+      width: 110px;
+      height: 110px;
+      border-radius: 10px;
+      background: #fff;
+      padding: 6px;
+    }
+    .qr-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #facc15;
+      margin-bottom: 6px;
+    }
+    .qr-url {
+      font-size: 12px;
+      color: #cbd5e1;
+      word-break: break-all;
+    }
+    .action {
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #facc15, #22d3ee);
+      color: #0d0f14;
+      box-shadow: 0 12px 20px rgba(34, 211, 238, 0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 26px rgba(34, 211, 238, 0.35);
+    }
+    .hint {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title">
+      Локальный сервер
+      <div class="status" id="server-status">
+        <span class="status-dot"></span>
+        <span class="status-text">Остановлен</span>
+      </div>
+    </div>
+    <p class="desc">
+      Поднимите локальный сервер для тестов и демонстраций. Окно можно оставить
+      поверх лаунчера на время работы.
+    </p>
+    <div class="info">
+      <div>Порт<span id="server-port">—</span></div>
+      <div>Клиенты<span id="server-clients">0</span></div>
+    </div>
+    <div class="qr" id="qr-block" hidden>
+      <img id="server-qr" alt="QR код для подключения" />
+      <div>
+        <div class="qr-title">Подключение</div>
+        <div class="qr-url" id="server-qr-url">—</div>
+      </div>
+    </div>
+    <div class="urls" id="server-urls"></div>
+    <button class="action" id="server-toggle" type="button">Запустить сервер</button>
+    <div class="hint" id="server-hint">Статус обновляется внутри модуля.</div>
+  </div>
+
+  <script>
+    const button = document.getElementById("server-toggle");
+    const status = document.getElementById("server-status");
+    const statusText = status.querySelector(".status-text");
+    const portEl = document.getElementById("server-port");
+    const clientsEl = document.getElementById("server-clients");
+    const urlsEl = document.getElementById("server-urls");
+    const hintEl = document.getElementById("server-hint");
+    const qrBlock = document.getElementById("qr-block");
+    const qrImg = document.getElementById("server-qr");
+    const qrUrlEl = document.getElementById("server-qr-url");
+
+    const isLocalhost = (url) =>
+      url.includes("localhost") || url.includes("127.0.0.1");
+
+    const pickQrUrl = (urls) => {
+      if (!Array.isArray(urls) || urls.length === 0) return "";
+      const external = urls.find((url) => !isLocalhost(url));
+      return external || urls[0];
+    };
+
+    const renderQr = async (url) => {
+      if (!qrImg || !qrUrlEl || !qrBlock) return;
+      if (!url) {
+        qrImg.removeAttribute("src");
+        qrUrlEl.textContent = "—";
+        qrBlock.hidden = true;
+        return;
+      }
+      qrUrlEl.textContent = url;
+      qrBlock.hidden = false;
+      if (!window.localServerAPI?.makeQrDataUrl) return;
+      try {
+        const dataUrl = await window.localServerAPI.makeQrDataUrl(url);
+        qrImg.src = dataUrl;
+      } catch (_) {
+        qrImg.removeAttribute("src");
+      }
+    };
+
+    const renderStatus = (data) => {
+      const running = Boolean(data?.running);
+      status.classList.toggle("is-running", running);
+      statusText.textContent = running ? "Запущен" : "Остановлен";
+      button.textContent = running ? "Остановить сервер" : "Запустить сервер";
+      portEl.textContent = running && data?.port ? String(data.port) : "—";
+      clientsEl.textContent = running ? String(data?.clients || 0) : "0";
+      if (data?.error) {
+        setHint(data.error);
+      } else {
+        setHint("");
+      }
+      if (!running) {
+        urlsEl.innerHTML = "";
+        renderQr("");
+        return;
+      }
+      const urls = Array.isArray(data?.httpUrls)
+        ? data.httpUrls
+        : Array.isArray(data?.urls)
+          ? data.urls
+          : [];
+      urlsEl.innerHTML = urls
+        .map((url) => `<div class="url-item">${url}</div>`)
+        .join("");
+      renderQr(pickQrUrl(urls));
+    };
+
+    const setHint = (text) => {
+      if (!hintEl) return;
+      hintEl.textContent = text || "Статус обновляется внутри модуля.";
+    };
+
+    if (window.localServerAPI?.onStatus) {
+      window.localServerAPI.onStatus(renderStatus);
+    }
+    if (window.localServerAPI?.getStatus) {
+      window.localServerAPI.getStatus().then(renderStatus).catch(() => {});
+    }
+
+    button.addEventListener("click", async () => {
+      if (!window.localServerAPI) return;
+      button.disabled = true;
+      try {
+        const current = await window.localServerAPI.getStatus();
+        if (current?.running) {
+          const result = await window.localServerAPI.stop();
+          if (!result?.ok && result?.error) setHint(result.error);
+        } else {
+          const result = await window.localServerAPI.start();
+          if (!result?.ok && result?.error) setHint(result.error);
+        }
+      } catch (error) {
+        setHint(error?.message || "Ошибка управления сервером");
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

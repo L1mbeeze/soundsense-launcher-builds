@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceNote — Питч-график</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 15% 20%, rgba(36, 209, 127, 0.25), transparent 55%),
+          radial-gradient(circle at 85% 10%, rgba(79, 141, 255, 0.2), transparent 50%),
+          linear-gradient(160deg, #0b0f14 0%, #141824 50%, #0b0f14 100%);
+        color: #e2e8f0;
+        font-family: "Bahnschrift", "Segoe UI Variable", "Segoe UI", sans-serif;
+        overflow: hidden;
+      }
+
+      .app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        padding: 28px 32px 32px;
+        gap: 24px;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: minmax(300px, 420px) minmax(240px, 1fr);
+        gap: 16px;
+        align-items: center;
+        border-radius: 20px;
+        padding: 12px 16px;
+        background: rgba(10, 14, 20, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 20px 40px rgba(4, 8, 16, 0.35);
+      }
+
+      .brand h1 {
+        margin: 6px 0 4px;
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .brand p {
+        margin: 0;
+        color: rgba(226, 232, 240, 0.7);
+        font-size: 12px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+      }
+
+      .controls {
+        display: grid;
+        gap: 8px;
+        justify-items: stretch;
+      }
+
+      .controls-actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        align-items: center;
+      }
+
+      .settings-panel {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: end;
+      }
+
+      .control span {
+        display: block;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(148, 163, 184, 0.8);
+        margin-bottom: 4px;
+      }
+
+      .control-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+
+      .control-title span {
+        margin: 0;
+      }
+
+      .control-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        color: rgba(148, 163, 184, 0.8);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .control-toggle input {
+        margin: 0;
+      }
+
+      select {
+        width: 100%;
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        outline: none;
+        font-size: 12px;
+      }
+
+      .control-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .control--full {
+        grid-column: 1 / -1;
+      }
+
+      .action-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .range-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #22c55e;
+        height: 14px;
+      }
+
+      input[type="file"] {
+        width: 100%;
+        padding: 6px 8px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        outline: none;
+        font-size: 11px;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        padding: 6px 8px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e2e8f0;
+        outline: none;
+        font-size: 12px;
+      }
+
+      .range-value {
+        min-width: 28px;
+        text-align: right;
+        font-size: 10px;
+        color: rgba(226, 232, 240, 0.8);
+      }
+
+      button {
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .controls button {
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+
+      .toggle-btn {
+        background: rgba(148, 163, 184, 0.2);
+        color: rgba(226, 232, 240, 0.85);
+      }
+
+      #start-btn {
+        background: linear-gradient(135deg, #22c55e, #14b8a6);
+        color: #0b111a;
+        box-shadow: 0 16px 24px rgba(20, 184, 166, 0.25);
+      }
+
+      #stop-btn {
+        background: rgba(148, 163, 184, 0.2);
+        color: rgba(226, 232, 240, 0.8);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      button:not(:disabled):hover {
+        transform: translateY(-1px);
+      }
+
+      .status {
+        font-size: 11px;
+        color: rgba(226, 232, 240, 0.7);
+      }
+
+      .controls.is-collapsed .settings-panel,
+      .controls.is-collapsed .status {
+        display: none;
+      }
+
+      .stage {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 20px;
+        min-height: 0;
+      }
+
+      .keys-panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .keys-spacer {
+        height: 0;
+      }
+
+      .keys-scroll {
+        border-radius: 18px;
+        overflow: auto;
+        border-radius: 18px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        min-height: 0;
+        flex: 1;
+      }
+
+      .keys {
+        display: grid;
+        grid-auto-rows: var(--key-size);
+      }
+
+      .key {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 10px;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .key--white {
+        background: rgba(226, 232, 240, 0.12);
+        color: rgba(226, 232, 240, 0.85);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      }
+
+      .key--black {
+        background: rgba(15, 23, 42, 0.85);
+        color: rgba(148, 163, 184, 0.9);
+        border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+      }
+
+      .graph {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 0;
+      }
+
+      .graph-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .readout {
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+
+      .hint {
+        font-size: 12px;
+        color: rgba(148, 163, 184, 0.9);
+      }
+
+      .graph-canvas {
+        position: relative;
+        width: 100%;
+      }
+
+      .graph-scroll {
+        position: relative;
+        border-radius: 18px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        background: rgba(10, 14, 20, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        min-height: 0;
+        flex: 1;
+      }
+
+      canvas {
+        position: absolute;
+        inset: 0;
+      }
+
+      #midi-layer {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+
+      @media (max-width: 960px) {
+        .topbar {
+          grid-template-columns: 1fr;
+        }
+
+        .stage {
+          grid-template-columns: 1fr;
+        }
+
+        .keys {
+          order: 2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="tag">VoiceNote</span>
+          <h1>Pitch Canvas</h1>
+          <p>Слушаем микрофон и рисуем ноты в реальном времени.</p>
+        </div>
+        <div class="controls">
+          <div class="controls-actions">
+            <button id="start-btn" type="button">Старт</button>
+            <button id="stop-btn" type="button" disabled>Стоп</button>
+            <button id="toggle-settings-btn" class="toggle-btn" type="button">⚙</button>
+          </div>
+          <div class="settings-panel" id="settings-panel">
+            <label class="control">
+              <span>Микрофон</span>
+              <select id="device-select"></select>
+            </label>
+            <label class="control">
+              <span>Детектор</span>
+              <select id="detector-select">
+                <option value="acf">Автокорреляция</option>
+                <option value="yin">YIN</option>
+                <option value="mpm">MPM</option>
+                <option value="crepe">CREPE (ml5)</option>
+              </select>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Чувствительность</span>
+              </div>
+              <div class="range-row">
+                <input id="sensitivity-range" type="range" min="0" max="100" value="40" />
+                <span class="range-value" id="sensitivity-value">40</span>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Сглаживание</span>
+                <label class="control-toggle">
+                  <input id="smoothing-toggle" type="checkbox" checked />
+                  on
+                </label>
+              </div>
+              <div class="range-row">
+                <input id="smoothing-range" type="range" min="0" max="100" value="30" />
+                <span class="range-value" id="smoothing-value">30</span>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Hold (мс)</span>
+                <label class="control-toggle">
+                  <input id="hold-toggle" type="checkbox" checked />
+                  on
+                </label>
+              </div>
+              <div class="range-row">
+                <input id="hold-range" type="range" min="0" max="300" value="120" />
+                <span class="range-value" id="hold-value">120</span>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Макс. скачок</span>
+                <label class="control-toggle">
+                  <input id="jump-toggle" type="checkbox" checked />
+                  on
+                </label>
+              </div>
+              <div class="range-row">
+                <input id="jump-range" type="range" min="0" max="12" value="5" />
+                <span class="range-value" id="jump-value">5</span>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Мин. частота</span>
+                <label class="control-toggle">
+                  <input id="freq-toggle" type="checkbox" checked />
+                  on
+                </label>
+              </div>
+              <div class="range-row">
+                <input id="minfreq-input" type="number" min="40" max="300" value="80" />
+                <span class="range-value">Hz</span>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Макс. частота</span>
+              </div>
+              <div class="range-row">
+                <input id="maxfreq-input" type="number" min="300" max="2000" value="1000" />
+                <span class="range-value">Hz</span>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Медиана (N)</span>
+                <label class="control-toggle">
+                  <input id="median-toggle" type="checkbox" checked />
+                  on
+                </label>
+              </div>
+              <div class="range-row">
+                <input id="median-range" type="range" min="1" max="9" value="3" step="2" />
+                <span class="range-value" id="median-value">3</span>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>MIDI файл</span>
+              </div>
+              <input id="midi-input" type="file" accept=".mid,.midi,.kar" />
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Дорожка MIDI</span>
+              </div>
+              <select id="midi-track-select"></select>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>MIDI масштаб</span>
+              </div>
+              <div class="range-row">
+                <input id="midi-scale" type="range" min="0.5" max="3" value="1" step="0.1" />
+                <span class="range-value" id="midi-scale-value">1.0</span>
+              </div>
+            </label>
+            <label class="control">
+              <div class="control-title">
+                <span>Транспозиция</span>
+              </div>
+              <div class="range-row">
+                <input id="midi-transpose" type="range" min="-24" max="24" value="0" step="1" />
+                <span class="range-value" id="midi-transpose-value">0</span>
+              </div>
+            </label>
+            <div class="action-row control--full">
+              <button id="size-up-btn" type="button">Клавиши +</button>
+              <button id="size-down-btn" type="button">Клавиши −</button>
+              <button id="clear-trace-btn" type="button">Очистить</button>
+              <div></div>
+            </div>
+          </div>
+          <div class="status" id="status">Микрофон не выбран.</div>
+        </div>
+      </header>
+
+      <main class="stage">
+        <div class="keys-panel">
+          <div class="keys-spacer" id="keys-spacer"></div>
+          <div class="keys-scroll" id="keys-scroll">
+            <aside class="keys" id="keys"></aside>
+          </div>
+        </div>
+        <section class="graph">
+          <div class="graph-header" id="graph-header">
+            <div class="readout" id="readout">Готов к запуску</div>
+            <div class="hint">Линия появляется справа и уходит влево.</div>
+          </div>
+          <div class="graph-scroll" id="graph-scroll">
+            <div class="graph-canvas" id="graph-canvas">
+              <canvas id="grid"></canvas>
+              <canvas id="midi-layer"></canvas>
+              <canvas id="trace"></canvas>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ml5@0.12.2/dist/ml5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.js"></script>
+    <script>
+      const MIN_MIDI = 36; // C2
+      const MAX_MIDI = 84; // C6
+      const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+      const SPEED_PX = 60;
+      const HISTORY_SECONDS = 60;
+      const HISTORY_CHUNK_SECONDS = 30;
+      const DRAW_SMOOTHING = 0.35;
+      const MIN_KEY_SIZE = 22;
+      const MAX_KEY_SIZE = 52;
+      const KEY_STEP = 4;
+      let keySize = 30;
+      const keysEl = document.getElementById("keys");
+      const keysSpacer = document.getElementById("keys-spacer");
+      const keysScroll = document.getElementById("keys-scroll");
+      const graphHeader = document.getElementById("graph-header");
+      const graphScroll = document.getElementById("graph-scroll");
+      const graphCanvas = document.getElementById("graph-canvas");
+      const controlsEl = document.querySelector(".controls");
+      const sizeUpBtn = document.getElementById("size-up-btn");
+      const sizeDownBtn = document.getElementById("size-down-btn");
+      const clearTraceBtn = document.getElementById("clear-trace-btn");
+      const toggleSettingsBtn = document.getElementById("toggle-settings-btn");
+      const detectorSelect = document.getElementById("detector-select");
+      const sensitivityRange = document.getElementById("sensitivity-range");
+      const sensitivityValue = document.getElementById("sensitivity-value");
+      const smoothingRange = document.getElementById("smoothing-range");
+      const smoothingValue = document.getElementById("smoothing-value");
+      const smoothingToggle = document.getElementById("smoothing-toggle");
+      const holdRange = document.getElementById("hold-range");
+      const holdValue = document.getElementById("hold-value");
+      const holdToggle = document.getElementById("hold-toggle");
+      const jumpRange = document.getElementById("jump-range");
+      const jumpValue = document.getElementById("jump-value");
+      const jumpToggle = document.getElementById("jump-toggle");
+      const minFreqInput = document.getElementById("minfreq-input");
+      const maxFreqInput = document.getElementById("maxfreq-input");
+      const freqToggle = document.getElementById("freq-toggle");
+      const medianRange = document.getElementById("median-range");
+      const medianValue = document.getElementById("median-value");
+      const medianToggle = document.getElementById("median-toggle");
+      const midiInput = document.getElementById("midi-input");
+      const midiTrackSelect = document.getElementById("midi-track-select");
+      const midiScaleRange = document.getElementById("midi-scale");
+      const midiScaleValue = document.getElementById("midi-scale-value");
+      const midiTransposeRange = document.getElementById("midi-transpose");
+      const midiTransposeValue = document.getElementById("midi-transpose-value");
+      const deviceSelect = document.getElementById("device-select");
+      const startBtn = document.getElementById("start-btn");
+      const stopBtn = document.getElementById("stop-btn");
+      const statusEl = document.getElementById("status");
+      const readoutEl = document.getElementById("readout");
+      const gridCanvas = document.getElementById("grid");
+      const midiCanvas = document.getElementById("midi-layer");
+      const traceCanvas = document.getElementById("trace");
+      const gridCtx = gridCanvas.getContext("2d");
+      const midiCtx = midiCanvas.getContext("2d");
+      const traceCtx = traceCanvas.getContext("2d");
+
+      let audioContext = null;
+      let analyser = null;
+      let dataBuffer = null;
+      let mediaStream = null;
+      let isRunning = false;
+      let lastFrame = null;
+      let lastY = null;
+      let lastDrawY = null;
+      let traceHasData = false;
+      let traceCursorX = 0;
+      let autoFollowX = true;
+      let historyWidth = 0;
+      let manualScrollUntil = 0;
+      let autoScrollingX = false;
+      let programmaticScrollUntil = 0;
+      let smoothedMidi = null;
+      let lastValidMidi = null;
+      let lastValidAt = 0;
+      let medianBuffer = [];
+      let saveTimer = null;
+      let crepeDetector = null;
+      let crepeLatest = -1;
+      let crepeUpdatedAt = 0;
+      let crepeActive = false;
+
+      let midiNotesRaw = [];
+      let midiNotes = [];
+      let midiTracks = [];
+      let midiTrackIndex = 0;
+      let midiScale = 1;
+      let midiTranspose = 0;
+      let midiTime = 0;
+      let midiIndex = 0;
+      let midiLoaded = false;
+      const MIDI_MATCH_CENTS = 50;
+
+      const configState = {
+        detector: "acf",
+        sensitivity: 40,
+        smoothing: 30,
+        smoothingEnabled: true,
+        holdMs: 120,
+        holdEnabled: true,
+        maxJump: 5,
+        jumpEnabled: true,
+        minFreq: 80,
+        maxFreq: 1000,
+        freqEnabled: true,
+        medianSize: 3,
+        medianEnabled: true,
+        keySize: 30,
+        deviceId: "",
+        settingsOpen: true,
+        midiScale: 1,
+        midiTrackIndex: 0,
+        midiTranspose: 0,
+      };
+
+      const noteRange = MAX_MIDI - MIN_MIDI;
+
+      function midiToFreq(midi) {
+        return 440 * Math.pow(2, (midi - 69) / 12);
+      }
+
+      function freqToMidi(freq) {
+        return 69 + 12 * Math.log2(freq / 440);
+      }
+
+      function formatNote(midi) {
+        const rounded = Math.round(midi);
+        const name = NOTE_NAMES[(rounded + 1200) % 12];
+        const octave = Math.floor(rounded / 12) - 1;
+        return `${name}${octave}`;
+      }
+
+      function isBlackKey(midi) {
+        const mod = ((midi % 12) + 12) % 12;
+        return [1, 3, 6, 8, 10].includes(mod);
+      }
+
+      function buildKeys() {
+        keysEl.style.setProperty("--key-count", noteRange + 1);
+        keysEl.style.setProperty("--key-size", `${keySize}px`);
+        keysEl.innerHTML = "";
+        for (let midi = MAX_MIDI; midi >= MIN_MIDI; midi -= 1) {
+          const key = document.createElement("div");
+          key.className = `key ${isBlackKey(midi) ? "key--black" : "key--white"}`;
+          const label = document.createElement("span");
+          label.textContent = formatNote(midi);
+          key.appendChild(label);
+          keysEl.appendChild(key);
+        }
+      }
+
+      function updateCanvases() {
+        historyWidth = Math.max(
+          graphScroll.clientWidth,
+          Math.round(SPEED_PX * HISTORY_SECONDS)
+        );
+        const totalHeight = (noteRange + 1) * keySize;
+        keysEl.style.height = `${totalHeight}px`;
+        graphCanvas.style.height = `${totalHeight}px`;
+        graphCanvas.style.width = `${historyWidth}px`;
+        gridCanvas.width = historyWidth;
+        gridCanvas.height = totalHeight;
+        midiCanvas.width = historyWidth;
+        midiCanvas.height = totalHeight;
+        traceCanvas.width = historyWidth;
+        traceCanvas.height = totalHeight;
+        if (graphHeader && keysSpacer) {
+          keysSpacer.style.height = `${graphHeader.getBoundingClientRect().height}px`;
+        }
+        drawGrid();
+        drawMidiLayer();
+        syncGraphScroll();
+      }
+
+      function expandHistoryWidth(extraWidth) {
+        if (extraWidth <= 0) return;
+        const newWidth = historyWidth + extraWidth;
+        const totalHeight = traceCanvas.height;
+        const prevTrace = document.createElement("canvas");
+        prevTrace.width = traceCanvas.width;
+        prevTrace.height = traceCanvas.height;
+        const prevCtx = prevTrace.getContext("2d");
+        prevCtx.drawImage(traceCanvas, 0, 0);
+
+        historyWidth = newWidth;
+        graphCanvas.style.width = `${historyWidth}px`;
+        gridCanvas.width = historyWidth;
+        traceCanvas.width = historyWidth;
+        midiCanvas.width = historyWidth;
+        gridCanvas.height = totalHeight;
+        traceCanvas.height = totalHeight;
+        midiCanvas.height = totalHeight;
+        drawGrid();
+        traceCtx.drawImage(prevTrace, 0, 0);
+        drawMidiLayer();
+      }
+
+      function scheduleSave() {
+        if (!window.voiceNoteConfig?.writeConfig) return;
+        if (saveTimer) clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          window.voiceNoteConfig.writeConfig({ ...configState });
+          saveTimer = null;
+        }, 200);
+      }
+
+      function applyConfig() {
+        keySize = Math.min(MAX_KEY_SIZE, Math.max(MIN_KEY_SIZE, configState.keySize || 30));
+        configState.keySize = keySize;
+        if (detectorSelect) detectorSelect.value = configState.detector || "acf";
+        if (sensitivityRange) sensitivityRange.value = String(configState.sensitivity ?? 40);
+        if (smoothingRange) smoothingRange.value = String(configState.smoothing ?? 30);
+        if (smoothingToggle) smoothingToggle.checked = configState.smoothingEnabled !== false;
+        if (sensitivityValue) sensitivityValue.textContent = sensitivityRange.value;
+        if (smoothingValue) smoothingValue.textContent = smoothingRange.value;
+        if (holdRange) holdRange.value = String(configState.holdMs ?? 120);
+        if (holdToggle) holdToggle.checked = configState.holdEnabled !== false;
+        if (holdValue) holdValue.textContent = holdRange.value;
+        if (jumpRange) jumpRange.value = String(configState.maxJump ?? 5);
+        if (jumpToggle) jumpToggle.checked = configState.jumpEnabled !== false;
+        if (jumpValue) jumpValue.textContent = jumpRange.value;
+        if (minFreqInput) minFreqInput.value = String(configState.minFreq ?? 80);
+        if (maxFreqInput) maxFreqInput.value = String(configState.maxFreq ?? 1000);
+        if (freqToggle) freqToggle.checked = configState.freqEnabled !== false;
+        if (medianRange) medianRange.value = String(configState.medianSize ?? 3);
+        if (medianToggle) medianToggle.checked = configState.medianEnabled !== false;
+        if (medianValue) medianValue.textContent = medianRange.value;
+        if (midiScaleRange) midiScaleRange.value = String(configState.midiScale ?? 1);
+        if (midiScaleValue) {
+          midiScaleValue.textContent = Number(midiScaleRange.value).toFixed(1);
+        }
+        if (midiTransposeRange) midiTransposeRange.value = String(configState.midiTranspose ?? 0);
+        if (midiTransposeValue) midiTransposeValue.textContent = String(midiTransposeRange.value);
+        if (midiTrackSelect && midiTracks.length) {
+          midiTrackIndex = Math.max(0, Math.min(midiTracks.length - 1, Number(configState.midiTrackIndex ?? 0)));
+          midiTrackSelect.value = String(midiTrackIndex);
+        }
+        if (controlsEl) {
+          controlsEl.classList.toggle("is-collapsed", configState.settingsOpen === false);
+        }
+      }
+
+      function loadConfig() {
+        if (!window.voiceNoteConfig?.readConfig) return;
+        const stored = window.voiceNoteConfig.readConfig();
+        if (stored && typeof stored === "object") {
+          Object.assign(configState, stored);
+        }
+        applyConfig();
+      }
+
+      function syncGraphScroll() {
+        if (!graphCanvas || !keysScroll) return;
+        graphCanvas.style.transform = `translateY(${-keysScroll.scrollTop}px)`;
+      }
+
+      function clearTrace() {
+        traceCtx.clearRect(0, 0, traceCanvas.width, traceCanvas.height);
+        traceCursorX = graphScroll ? graphScroll.clientWidth / 2 : 0;
+        lastY = null;
+        lastDrawY = null;
+        traceHasData = false;
+        if (midiLoaded && midiNotes.length > 0) {
+          midiIndex = 0;
+          midiTime = midiNotes[0].start;
+          drawMidiLayer();
+        }
+        if (graphScroll) {
+          graphScroll.scrollLeft = 0;
+        }
+      }
+
+      function drawGrid() {
+        const width = gridCanvas.width;
+        const height = gridCanvas.height;
+        gridCtx.clearRect(0, 0, width, height);
+        gridCtx.fillStyle = "rgba(2, 6, 12, 0.6)";
+        gridCtx.fillRect(0, 0, width, height);
+
+        for (let midi = MIN_MIDI; midi <= MAX_MIDI; midi += 1) {
+          const y = pitchToY(midi);
+          const isBlack = isBlackKey(midi);
+          const isOctave = midi % 12 === 0;
+          gridCtx.strokeStyle = isOctave
+            ? "rgba(148, 163, 184, 0.4)"
+            : isBlack
+              ? "rgba(30, 41, 59, 0.8)"
+              : "rgba(71, 85, 105, 0.35)";
+          gridCtx.lineWidth = isOctave ? 1.2 : 0.8;
+          gridCtx.beginPath();
+          gridCtx.moveTo(0, y);
+          gridCtx.lineTo(width, y);
+          gridCtx.stroke();
+        }
+      }
+
+      function pitchToY(midi) {
+        return (MAX_MIDI - midi) * keySize;
+      }
+
+      function pitchToCenterY(midi) {
+        return (MAX_MIDI - midi) * keySize + keySize / 2;
+      }
+
+      function autoCorrelate(buffer, sampleRate, threshold) {
+        const size = buffer.length;
+        let rms = 0;
+        for (let i = 0; i < size; i += 1) {
+          const value = buffer[i];
+          rms += value * value;
+        }
+        rms = Math.sqrt(rms / size);
+        if (rms < threshold) return -1;
+
+        let r1 = 0;
+        let r2 = size - 1;
+        const zeroCrossThreshold = 0.2;
+        for (let i = 0; i < size / 2; i += 1) {
+          if (Math.abs(buffer[i]) < zeroCrossThreshold) {
+            r1 = i;
+            break;
+          }
+        }
+        for (let i = 1; i < size / 2; i += 1) {
+          if (Math.abs(buffer[size - i]) < zeroCrossThreshold) {
+            r2 = size - i;
+            break;
+          }
+        }
+
+        const trimmed = buffer.slice(r1, r2);
+        const trimmedSize = trimmed.length;
+        const correlations = new Array(trimmedSize).fill(0);
+        for (let i = 0; i < trimmedSize; i += 1) {
+          for (let j = 0; j < trimmedSize - i; j += 1) {
+            correlations[i] += trimmed[j] * trimmed[j + i];
+          }
+        }
+
+        let d = 0;
+        while (correlations[d] > correlations[d + 1]) d += 1;
+        let maxVal = -1;
+        let maxPos = -1;
+        for (let i = d; i < trimmedSize; i += 1) {
+          if (correlations[i] > maxVal) {
+            maxVal = correlations[i];
+            maxPos = i;
+          }
+        }
+        if (maxPos <= 0) return -1;
+
+        let t0 = maxPos;
+        const x1 = correlations[t0 - 1];
+        const x2 = correlations[t0];
+        const x3 = correlations[t0 + 1];
+        const a = (x1 + x3 - 2 * x2) / 2;
+        const b = (x3 - x1) / 2;
+        if (a !== 0) {
+          t0 -= b / (2 * a);
+        }
+        return sampleRate / t0;
+      }
+
+      function yinPitch(buffer, sampleRate, threshold) {
+        const size = buffer.length;
+        let rms = 0;
+        for (let i = 0; i < size; i += 1) {
+          const value = buffer[i];
+          rms += value * value;
+        }
+        rms = Math.sqrt(rms / size);
+        if (rms < threshold) return -1;
+
+        const minFreq = 80;
+        const maxFreq = 1000;
+        const tauMin = Math.floor(sampleRate / maxFreq);
+        const tauMax = Math.min(Math.floor(sampleRate / minFreq), size - 1);
+        const diff = new Float32Array(tauMax + 1);
+        const cmnd = new Float32Array(tauMax + 1);
+
+        for (let tau = 1; tau <= tauMax; tau += 1) {
+          let sum = 0;
+          for (let i = 0; i < size - tau; i += 1) {
+            const delta = buffer[i] - buffer[i + tau];
+            sum += delta * delta;
+          }
+          diff[tau] = sum;
+        }
+
+        let runningSum = 0;
+        cmnd[0] = 1;
+        for (let tau = 1; tau <= tauMax; tau += 1) {
+          runningSum += diff[tau];
+          cmnd[tau] = diff[tau] * tau / (runningSum || 1);
+        }
+
+        const yinThreshold = 0.15;
+        let tauEstimate = -1;
+        for (let tau = tauMin; tau <= tauMax; tau += 1) {
+          if (cmnd[tau] < yinThreshold) {
+            while (tau + 1 <= tauMax && cmnd[tau + 1] < cmnd[tau]) {
+              tau += 1;
+            }
+            tauEstimate = tau;
+            break;
+          }
+        }
+
+        if (tauEstimate === -1) {
+          let minVal = 1;
+          let minTau = -1;
+          for (let tau = tauMin; tau <= tauMax; tau += 1) {
+            if (cmnd[tau] < minVal) {
+              minVal = cmnd[tau];
+              minTau = tau;
+            }
+          }
+          tauEstimate = minTau;
+        }
+
+        if (tauEstimate <= 0) return -1;
+        const prev = cmnd[tauEstimate - 1] || cmnd[tauEstimate];
+        const next = cmnd[tauEstimate + 1] || cmnd[tauEstimate];
+        const denom = prev + next - 2 * cmnd[tauEstimate];
+        const betterTau = denom === 0
+          ? tauEstimate
+          : tauEstimate + (prev - next) / (2 * denom);
+        return sampleRate / betterTau;
+      }
+
+      function mpmPitch(buffer, sampleRate, threshold) {
+        const size = buffer.length;
+        let rms = 0;
+        for (let i = 0; i < size; i += 1) {
+          const value = buffer[i];
+          rms += value * value;
+        }
+        rms = Math.sqrt(rms / size);
+        if (rms < threshold) return -1;
+
+        const minFreq = 80;
+        const maxFreq = 1000;
+        const tauMin = Math.floor(sampleRate / maxFreq);
+        const tauMax = Math.min(Math.floor(sampleRate / minFreq), size - 1);
+        const nsdf = new Float32Array(tauMax + 1);
+
+        for (let tau = 0; tau <= tauMax; tau += 1) {
+          let acf = 0;
+          let m = 0;
+          for (let i = 0; i < size - tau; i += 1) {
+            const x1 = buffer[i];
+            const x2 = buffer[i + tau];
+            acf += x1 * x2;
+            m += x1 * x1 + x2 * x2;
+          }
+          nsdf[tau] = m ? (2 * acf) / m : 0;
+        }
+
+        let bestTau = -1;
+        let bestVal = -1;
+        let pos = tauMin;
+        while (pos < tauMax && nsdf[pos] > 0) pos += 1;
+        while (pos < tauMax) {
+          while (pos < tauMax && nsdf[pos] <= 0) pos += 1;
+          let maxPos = pos;
+          let maxVal = -1;
+          while (pos < tauMax && nsdf[pos] > 0) {
+            if (nsdf[pos] > maxVal) {
+              maxVal = nsdf[pos];
+              maxPos = pos;
+            }
+            pos += 1;
+          }
+          if (maxVal > bestVal) {
+            bestVal = maxVal;
+            bestTau = maxPos;
+          }
+        }
+
+        if (bestTau <= 0 || bestVal < 0.3) return -1;
+        const prev = nsdf[bestTau - 1] || nsdf[bestTau];
+        const next = nsdf[bestTau + 1] || nsdf[bestTau];
+        const denom = prev + next - 2 * nsdf[bestTau];
+        const betterTau = denom === 0
+          ? bestTau
+          : bestTau + (prev - next) / (2 * denom);
+        return sampleRate / betterTau;
+      }
+
+      function detectPitch(buffer, sampleRate) {
+        const mode = detectorSelect?.value || "acf";
+        const threshold = getSensitivityThreshold();
+        if (mode === "crepe") {
+          const age = performance.now() - crepeUpdatedAt;
+          if (age > 200) return -1;
+          return crepeLatest > 0 ? crepeLatest : -1;
+        }
+        if (mode === "yin") return yinPitch(buffer, sampleRate, threshold);
+        if (mode === "mpm") return mpmPitch(buffer, sampleRate, threshold);
+        return autoCorrelate(buffer, sampleRate, threshold);
+      }
+
+      function getSensitivityThreshold() {
+        const value = Number(sensitivityRange?.value ?? 40);
+        const min = 0.005;
+        const max = 0.05;
+        const ratio = value / 100;
+        return max - (max - min) * ratio;
+      }
+
+      function getSmoothingAmount() {
+        if (smoothingToggle && !smoothingToggle.checked) return 0;
+        const value = Number(smoothingRange?.value ?? 30);
+        return value / 100;
+      }
+
+      function getHoldMs() {
+        if (holdToggle && !holdToggle.checked) return 0;
+        return Number(holdRange?.value ?? configState.holdMs ?? 0);
+      }
+
+      function getMaxJump() {
+        if (jumpToggle && !jumpToggle.checked) return 0;
+        return Number(jumpRange?.value ?? configState.maxJump ?? 0);
+      }
+
+      function getFreqRange() {
+        if (freqToggle && !freqToggle.checked) {
+          return { min: 0, max: Number.POSITIVE_INFINITY };
+        }
+        const min = Number(minFreqInput?.value ?? configState.minFreq ?? 80);
+        const max = Number(maxFreqInput?.value ?? configState.maxFreq ?? 1000);
+        return { min: Math.max(20, Math.min(min, max)), max: Math.max(min, max) };
+      }
+
+      function getMedianSize() {
+        if (medianToggle && !medianToggle.checked) return 1;
+        return Number(medianRange?.value ?? configState.medianSize ?? 1);
+      }
+
+      function applyMedianFilter(value) {
+        if (detectorSelect?.value === "crepe") return value;
+        const size = getMedianSize();
+        if (!size || size <= 1) {
+          medianBuffer = [];
+          return value;
+        }
+        medianBuffer.push(value);
+        if (medianBuffer.length > size) {
+          medianBuffer.shift();
+        }
+        if (medianBuffer.length < size) return value;
+        const sorted = [...medianBuffer].sort((a, b) => a - b);
+        return sorted[Math.floor(sorted.length / 2)];
+      }
+
+      function rebuildMidiNotes() {
+        midiScale = Number(midiScaleRange?.value ?? configState.midiScale ?? 1);
+        midiTranspose = Number(midiTransposeRange?.value ?? configState.midiTranspose ?? 0);
+        const selectedTrack = midiTracks[midiTrackIndex];
+        const baseNotes = selectedTrack?.notes || [];
+        midiNotes = baseNotes.map((note) => ({
+          midi: note.midi + midiTranspose,
+          start: note.start * midiScale,
+          duration: note.duration * midiScale,
+        }));
+        midiLoaded = midiNotes.length > 0;
+        if (midiLoaded) {
+          midiIndex = 0;
+          midiTime = midiNotes[0].start;
+        }
+      }
+
+      function decodeMidiText(bytes) {
+        if (!bytes || bytes.length === 0) return "";
+        let text = "";
+        if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
+          text = new TextDecoder("utf-16le", { fatal: false }).decode(bytes.subarray(2));
+        } else if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
+          text = new TextDecoder("utf-16be", { fatal: false }).decode(bytes.subarray(2));
+        } else {
+          text = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
+        }
+        text = text.replace(/\0/g, "").trim();
+        if (!text) {
+          text = new TextDecoder("latin1", { fatal: false }).decode(bytes).replace(/\0/g, "").trim();
+        }
+        return text;
+      }
+
+      function parseMidiTrackNames(buffer) {
+        const data = new DataView(buffer);
+        let offset = 0;
+        const readUint32 = () => {
+          const value = data.getUint32(offset, false);
+          offset += 4;
+          return value;
+        };
+        const readUint16 = () => {
+          const value = data.getUint16(offset, false);
+          offset += 2;
+          return value;
+        };
+        const readVarLen = () => {
+          let value = 0;
+          while (offset < data.byteLength) {
+            const byte = data.getUint8(offset++);
+            value = (value << 7) | (byte & 0x7f);
+            if ((byte & 0x80) === 0) break;
+          }
+          return value;
+        };
+
+        if (data.byteLength < 14) return [];
+        const headerId = String.fromCharCode(
+          data.getUint8(0),
+          data.getUint8(1),
+          data.getUint8(2),
+          data.getUint8(3)
+        );
+        if (headerId !== "MThd") return [];
+        offset = 4;
+        const headerLen = readUint32();
+        if (headerLen < 6 || 8 + headerLen > data.byteLength) return [];
+        const format = readUint16();
+        const trackCount = readUint16();
+        readUint16(); // division
+        offset = 8 + headerLen;
+
+        const names = new Array(trackCount).fill("");
+        for (let trackIndex = 0; trackIndex < trackCount; trackIndex += 1) {
+          if (offset + 8 > data.byteLength) break;
+          const trackId = String.fromCharCode(
+            data.getUint8(offset),
+            data.getUint8(offset + 1),
+            data.getUint8(offset + 2),
+            data.getUint8(offset + 3)
+          );
+          offset += 4;
+          if (trackId !== "MTrk") break;
+          const trackLen = readUint32();
+          const trackEnd = offset + trackLen;
+          let runningStatus = 0;
+          while (offset < trackEnd) {
+            readVarLen();
+            if (offset >= trackEnd) break;
+            let status = data.getUint8(offset++);
+            if (status < 0x80) {
+              offset -= 1;
+              status = runningStatus;
+            } else {
+              runningStatus = status;
+            }
+            if (status === 0xff) {
+              const type = data.getUint8(offset++);
+              const length = readVarLen();
+              if ((type === 0x03 || type === 0x04 || type === 0x08) && !names[trackIndex]) {
+                const bytes = new Uint8Array(buffer, offset, length);
+                const name = decodeMidiText(bytes);
+                names[trackIndex] = name;
+              }
+              offset += length;
+            } else if (status === 0xf0 || status === 0xf7) {
+              const length = readVarLen();
+              offset += length;
+            } else {
+              const type = status & 0xf0;
+              const dataLen = type === 0xc0 || type === 0xd0 ? 1 : 2;
+              offset += dataLen;
+            }
+          }
+          offset = trackEnd;
+        }
+        return names;
+      }
+
+      function loadMidiFromArrayBuffer(buffer) {
+        if (!window.Midi) {
+          statusEl.textContent = "MIDI парсер не загрузился.";
+          return;
+        }
+        try {
+          const midi = new window.Midi(buffer);
+          const trackNames = parseMidiTrackNames(buffer);
+          midiTracks = midi.tracks
+            .map((track, index) => {
+              const metaName =
+                typeof track.name === "string" && track.name.trim()
+                  ? track.name.trim()
+                  : typeof trackNames[index] === "string"
+                    ? trackNames[index].trim()
+                    : "";
+              return {
+                name: metaName,
+                notes: track.notes.map((note) => ({
+                  midi: note.midi,
+                  start: note.time,
+                  duration: note.duration,
+                })),
+              };
+            })
+            .filter((track) => track.notes.length > 0);
+          const hasNames = midiTracks.some((track) => track.name);
+          if (!hasNames) {
+            midiTracks = midiTracks.map((track, index) => ({
+              ...track,
+              name: `Дорожка ${index + 1}`,
+            }));
+          }
+          midiTrackIndex = 0;
+          configState.midiTrackIndex = midiTrackIndex;
+          if (midiTrackSelect) {
+            midiTrackSelect.innerHTML = "";
+            midiTracks.forEach((track, index) => {
+              const opt = document.createElement("option");
+              opt.value = String(index);
+              opt.textContent = track.name;
+              midiTrackSelect.appendChild(opt);
+            });
+            if (!midiTracks.length) {
+              const opt = document.createElement("option");
+              opt.value = "";
+              opt.textContent = "Нет дорожек с нотами";
+              midiTrackSelect.appendChild(opt);
+              midiTrackSelect.disabled = true;
+            } else {
+              midiTrackSelect.disabled = false;
+              midiTrackSelect.value = String(midiTrackIndex);
+            }
+          }
+          midiNotesRaw = [];
+          rebuildMidiNotes();
+          if (graphScroll) {
+            traceCursorX = graphScroll.clientWidth / 2;
+            graphScroll.scrollLeft = 0;
+          }
+          traceHasData = false;
+          drawMidiLayer();
+          statusEl.textContent = midiLoaded
+            ? `MIDI загружен · ${midiNotes.length} нот`
+            : "MIDI без именованных дорожек.";
+        } catch (error) {
+          statusEl.textContent = "Не удалось прочитать MIDI.";
+        }
+      }
+
+      function syncMidiIndex() {
+        if (!midiLoaded) return;
+        while (
+          midiIndex < midiNotes.length - 1 &&
+          midiTime >= midiNotes[midiIndex].start + midiNotes[midiIndex].duration
+        ) {
+          midiIndex += 1;
+          midiTime = midiNotes[midiIndex].start;
+        }
+      }
+
+      function updateMidiTime(candidateMidi, dt) {
+        if (!midiLoaded || midiNotes.length === 0) return;
+        const note = midiNotes[midiIndex];
+        if (!note) return;
+        if (candidateMidi == null) return;
+        const centsDiff = Math.abs((candidateMidi - note.midi) * 100);
+        if (centsDiff <= MIDI_MATCH_CENTS) {
+          midiTime += dt;
+          syncMidiIndex();
+        } else {
+          midiTime = note.start;
+        }
+      }
+
+      function drawMidiLayer() {
+        if (!midiLoaded) {
+          midiCtx.clearRect(0, 0, midiCanvas.width, midiCanvas.height);
+          return;
+        }
+        const width = midiCanvas.width;
+        const height = midiCanvas.height;
+        midiCtx.clearRect(0, 0, width, height);
+        const leftX = graphScroll ? graphScroll.scrollLeft : 0;
+        const viewWidth = graphScroll ? graphScroll.clientWidth : width;
+        const rightX = leftX + viewWidth;
+        const playheadX = leftX + viewWidth / 2;
+        const minTime = midiTime + (leftX - playheadX) / SPEED_PX;
+        const maxTime = midiTime + (rightX - playheadX) / SPEED_PX;
+        const noteHeight = Math.max(6, keySize * 0.8);
+        for (let i = 0; i < midiNotes.length; i += 1) {
+          const note = midiNotes[i];
+          const noteEnd = note.start + note.duration;
+          if (note.start > maxTime) break;
+          if (noteEnd < minTime) continue;
+          const x = playheadX + (note.start - midiTime) * SPEED_PX;
+          const w = Math.max(2, note.duration * SPEED_PX);
+          const yCenter = pitchToCenterY(note.midi);
+          const y = Math.max(0, Math.min(height - noteHeight, yCenter - noteHeight / 2));
+          midiCtx.fillStyle = i === midiIndex ? "rgba(56, 189, 248, 0.9)" : "rgba(125, 211, 252, 0.4)";
+          midiCtx.fillRect(x, y, w, noteHeight);
+        }
+      }
+
+      function computeRms(buffer) {
+        let rms = 0;
+        for (let i = 0; i < buffer.length; i += 1) {
+          const value = buffer[i];
+          rms += value * value;
+        }
+        return Math.sqrt(rms / buffer.length);
+      }
+
+      function updateReadout(freq, midi, cents) {
+        if (!freq || !Number.isFinite(freq)) {
+          readoutEl.textContent = "Слушаю...";
+          return;
+        }
+        const noteLabel = formatNote(midi);
+        const centsLabel = `${cents > 0 ? "+" : ""}${cents.toFixed(0)} cent`;
+        readoutEl.textContent = `${noteLabel} · ${freq.toFixed(1)} Hz · ${centsLabel}`;
+      }
+
+      function autoScrollToY(targetY) {
+        if (!keysScroll) return;
+        const margin = 40;
+        const top = keysScroll.scrollTop;
+        const bottom = top + keysScroll.clientHeight;
+        if (targetY > top + margin && targetY < bottom - margin) return;
+        const nextTop = Math.max(
+          0,
+          Math.min(
+            keysScroll.scrollHeight - keysScroll.clientHeight,
+            targetY - keysScroll.clientHeight / 2
+          )
+        );
+        keysScroll.scrollTop = top + (nextTop - top) * 0.2;
+        syncGraphScroll();
+      }
+
+      function drawTrace(freq, dt) {
+        const width = traceCanvas.width;
+
+        if (!freq || !Number.isFinite(freq)) {
+          lastY = null;
+          return;
+        }
+
+        const midi = freqToMidi(freq);
+        const nearestMidi = Math.round(midi);
+        const cents = 1200 * Math.log2(freq / midiToFreq(nearestMidi));
+        const y = pitchToCenterY(midi);
+        const drawY =
+          lastDrawY == null ? y : lastDrawY + (y - lastDrawY) * DRAW_SMOOTHING;
+        const color =
+          Math.abs(cents) <= 30
+            ? "#22c55e"
+            : Math.abs(cents) <= 60
+              ? "#fbbf24"
+              : "#f97316";
+
+        traceCtx.strokeStyle = color;
+        traceCtx.lineWidth = 2;
+        const nextX = traceCursorX + SPEED_PX * dt;
+        if (nextX >= width - 2) {
+          const extra = Math.max(
+            graphScroll.clientWidth,
+            Math.round(SPEED_PX * HISTORY_CHUNK_SECONDS)
+          );
+          expandHistoryWidth(extra);
+        }
+        traceCtx.beginPath();
+        if (lastY == null) {
+          traceCtx.moveTo(nextX, drawY);
+          traceCtx.lineTo(nextX, drawY);
+        } else {
+          traceCtx.moveTo(traceCursorX, lastY);
+          traceCtx.lineTo(nextX, drawY);
+        }
+        traceCtx.stroke();
+        traceCursorX = nextX;
+        lastY = drawY;
+        lastDrawY = drawY;
+        traceHasData = true;
+        autoScrollToY(drawY);
+        autoScrollToX();
+      }
+
+      function autoScrollToX() {
+        if (!graphScroll) return;
+        const maxScroll = graphScroll.scrollWidth - graphScroll.clientWidth;
+        const now = performance.now();
+        if (manualScrollUntil && now < manualScrollUntil) {
+          autoFollowX = false;
+          return;
+        }
+        autoFollowX = true;
+        const centerOffset = graphScroll.clientWidth / 2;
+        const target = Math.min(
+          maxScroll,
+          Math.max(0, traceCursorX - centerOffset)
+        );
+        autoScrollingX = true;
+        programmaticScrollUntil = now + 150;
+        graphScroll.scrollLeft = target;
+        requestAnimationFrame(() => {
+          autoScrollingX = false;
+        });
+      }
+
+      function tick(timestamp) {
+        if (!isRunning || !analyser) return;
+        if (!lastFrame) lastFrame = timestamp;
+        const dt = Math.max(0.016, (timestamp - lastFrame) / 1000);
+        lastFrame = timestamp;
+
+        analyser.getFloatTimeDomainData(dataBuffer);
+        const now = performance.now();
+        const rawFreq = detectPitch(dataBuffer, audioContext.sampleRate);
+        const { min, max } = getFreqRange();
+        const rms = computeRms(dataBuffer);
+        const rmsThreshold = getSensitivityThreshold();
+        let rawMidi = null;
+        if (rawFreq > 0 && rawFreq >= min && rawFreq <= max) {
+          rawMidi = freqToMidi(rawFreq);
+          lastValidMidi = rawMidi;
+          lastValidAt = now;
+        }
+
+        const holdMs = getHoldMs();
+        let candidateMidi = rawMidi;
+        if (candidateMidi == null && lastValidMidi != null && now - lastValidAt <= holdMs) {
+          candidateMidi = lastValidMidi;
+        }
+
+        updateMidiTime(candidateMidi, dt);
+        drawMidiLayer();
+
+        if (candidateMidi != null) {
+          const maxJump = detectorSelect?.value === "crepe" ? 0 : getMaxJump();
+          if (smoothedMidi != null && maxJump > 0) {
+            const diff = candidateMidi - smoothedMidi;
+            if (Math.abs(diff) > maxJump) {
+              candidateMidi = smoothedMidi + Math.sign(diff) * maxJump;
+            }
+          }
+
+          candidateMidi = applyMedianFilter(candidateMidi);
+
+          const smoothing = getSmoothingAmount();
+          if (smoothing > 0) {
+            const alpha = 1 - smoothing;
+            smoothedMidi =
+              smoothedMidi == null ? candidateMidi : alpha * candidateMidi + (1 - alpha) * smoothedMidi;
+          } else {
+            smoothedMidi = candidateMidi;
+          }
+          const freq = midiToFreq(smoothedMidi);
+          const nearestMidi = Math.round(smoothedMidi);
+          const cents = 1200 * Math.log2(freq / midiToFreq(nearestMidi));
+          updateReadout(freq, smoothedMidi, cents);
+          drawTrace(freq, dt);
+        } else {
+          smoothedMidi = null;
+          medianBuffer = [];
+          updateReadout(null, null, null);
+          drawTrace(null, dt);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      async function refreshDevices() {
+        if (!navigator.mediaDevices?.enumerateDevices) return;
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const inputs = devices.filter((device) => device.kind === "audioinput");
+        deviceSelect.innerHTML = "";
+        if (!inputs.length) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = "Нет микрофона (нужен доступ)";
+          deviceSelect.appendChild(option);
+          deviceSelect.disabled = true;
+          return;
+        }
+        const previousValue = deviceSelect.value || configState.deviceId;
+        deviceSelect.disabled = false;
+        inputs.forEach((device, index) => {
+          const option = document.createElement("option");
+          option.value = device.deviceId || "";
+          option.textContent = device.label || `Микрофон ${index + 1}`;
+          deviceSelect.appendChild(option);
+        });
+        const hasMatch = inputs.some((device) => device.deviceId === previousValue);
+        if (!hasMatch && inputs[0]) {
+          deviceSelect.value = inputs[0].deviceId;
+          configState.deviceId = inputs[0].deviceId || "";
+          scheduleSave();
+        } else if (previousValue) {
+          deviceSelect.value = previousValue;
+        }
+      }
+
+      async function ensureDeviceAccess() {
+        if (!navigator.mediaDevices?.getUserMedia) return false;
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach((track) => track.stop());
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      async function initCrepeDetector() {
+        stopCrepeDetector();
+        if (detectorSelect?.value !== "crepe") return;
+        if (!window.ml5 || !mediaStream || !audioContext) {
+          statusEl.textContent = "CREPE не загрузился.";
+          return;
+        }
+        const modelUrl =
+          "https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/";
+        crepeLatest = -1;
+        crepeDetector = await new Promise((resolve) => {
+          const detector = window.ml5.pitchDetection(
+            modelUrl,
+            audioContext,
+            mediaStream,
+            () => resolve(detector)
+          );
+        });
+        if (crepeDetector?.getPitch) {
+          crepeActive = true;
+          const pump = () => {
+            if (!crepeActive || !crepeDetector?.getPitch) return;
+            crepeDetector.getPitch((error, frequency) => {
+              if (!error && frequency) {
+                crepeLatest = frequency;
+                crepeUpdatedAt = performance.now();
+              }
+              if (crepeActive) {
+                requestAnimationFrame(pump);
+              }
+            });
+          };
+          requestAnimationFrame(pump);
+        }
+      }
+
+      function stopCrepeDetector() {
+        crepeActive = false;
+        crepeDetector = null;
+        crepeLatest = -1;
+        crepeUpdatedAt = 0;
+      }
+
+      async function startCapture() {
+        if (isRunning) return;
+        const deviceId = deviceSelect.value;
+        if (!navigator.mediaDevices?.getUserMedia) {
+          statusEl.textContent = "Браузер не поддерживает микрофон.";
+          return;
+        }
+        try {
+          if (!traceHasData) {
+            traceCursorX = graphScroll ? graphScroll.clientWidth / 2 : traceCursorX;
+          }
+          statusEl.textContent = "Запрашиваю доступ к микрофону...";
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: deviceId ? { deviceId: { exact: deviceId } } : true,
+          });
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 2048;
+          dataBuffer = new Float32Array(analyser.fftSize);
+          const source = audioContext.createMediaStreamSource(mediaStream);
+          source.connect(analyser);
+          await initCrepeDetector();
+          isRunning = true;
+          lastFrame = null;
+          lastY = null;
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+          statusEl.textContent = "Слушаю микрофон...";
+          refreshDevices();
+          requestAnimationFrame(tick);
+        } catch (error) {
+          statusEl.textContent = "Нет доступа к микрофону.";
+        }
+      }
+
+      async function stopCapture() {
+        if (!isRunning) return;
+        isRunning = false;
+        smoothedMidi = null;
+        lastValidMidi = null;
+        medianBuffer = [];
+        lastDrawY = null;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        statusEl.textContent = "Остановлено.";
+        stopCrepeDetector();
+        if (mediaStream) {
+          mediaStream.getTracks().forEach((track) => track.stop());
+          mediaStream = null;
+        }
+        if (audioContext) {
+          await audioContext.close();
+          audioContext = null;
+        }
+        analyser = null;
+      }
+
+      deviceSelect.addEventListener("change", () => {
+        configState.deviceId = deviceSelect.value || "";
+        scheduleSave();
+        if (isRunning) {
+          stopCapture().then(startCapture);
+        }
+      });
+      deviceSelect.addEventListener("mousedown", async () => {
+        if (deviceSelect.disabled) {
+          const granted = await ensureDeviceAccess();
+          if (granted) {
+            refreshDevices();
+          }
+        }
+      });
+      if (detectorSelect) {
+        detectorSelect.addEventListener("change", () => {
+          configState.detector = detectorSelect.value || "acf";
+          scheduleSave();
+          if (isRunning) {
+            stopCapture().then(startCapture);
+          }
+        });
+      }
+      if (keysScroll) {
+        keysScroll.addEventListener("scroll", syncGraphScroll);
+      }
+      if (graphScroll) {
+        graphScroll.addEventListener("scroll", () => {
+          if (midiLoaded) return;
+          if (autoScrollingX) return;
+          if (programmaticScrollUntil && performance.now() < programmaticScrollUntil) return;
+          manualScrollUntil = performance.now() + 3000;
+          autoFollowX = false;
+        });
+      }
+      if (sizeUpBtn && sizeDownBtn) {
+        sizeUpBtn.addEventListener("click", () => {
+          keySize = Math.min(MAX_KEY_SIZE, keySize + KEY_STEP);
+          configState.keySize = keySize;
+          buildKeys();
+          updateCanvases();
+          scheduleSave();
+        });
+        sizeDownBtn.addEventListener("click", () => {
+          keySize = Math.max(MIN_KEY_SIZE, keySize - KEY_STEP);
+          configState.keySize = keySize;
+          buildKeys();
+          updateCanvases();
+          scheduleSave();
+        });
+      }
+      if (clearTraceBtn) {
+        clearTraceBtn.addEventListener("click", () => {
+          clearTrace();
+        });
+      }
+      if (sensitivityRange && sensitivityValue) {
+        const updateSensitivityLabel = () => {
+          sensitivityValue.textContent = sensitivityRange.value;
+          configState.sensitivity = Number(sensitivityRange.value);
+          scheduleSave();
+        };
+        sensitivityRange.addEventListener("input", updateSensitivityLabel);
+        updateSensitivityLabel();
+      }
+      if (smoothingRange && smoothingValue) {
+        const updateSmoothingLabel = () => {
+          smoothingValue.textContent = smoothingRange.value;
+          configState.smoothing = Number(smoothingRange.value);
+          scheduleSave();
+        };
+        smoothingRange.addEventListener("input", updateSmoothingLabel);
+        updateSmoothingLabel();
+      }
+      if (smoothingToggle) {
+        smoothingToggle.addEventListener("change", () => {
+          configState.smoothingEnabled = smoothingToggle.checked;
+          scheduleSave();
+        });
+      }
+      if (holdRange && holdValue) {
+        const updateHoldLabel = () => {
+          holdValue.textContent = holdRange.value;
+          configState.holdMs = Number(holdRange.value);
+          scheduleSave();
+        };
+        holdRange.addEventListener("input", updateHoldLabel);
+        updateHoldLabel();
+      }
+      if (holdToggle) {
+        holdToggle.addEventListener("change", () => {
+          configState.holdEnabled = holdToggle.checked;
+          scheduleSave();
+        });
+      }
+      if (jumpRange && jumpValue) {
+        const updateJumpLabel = () => {
+          jumpValue.textContent = jumpRange.value;
+          configState.maxJump = Number(jumpRange.value);
+          scheduleSave();
+        };
+        jumpRange.addEventListener("input", updateJumpLabel);
+        updateJumpLabel();
+      }
+      if (jumpToggle) {
+        jumpToggle.addEventListener("change", () => {
+          configState.jumpEnabled = jumpToggle.checked;
+          scheduleSave();
+        });
+      }
+      if (minFreqInput) {
+        minFreqInput.addEventListener("change", () => {
+          configState.minFreq = Number(minFreqInput.value);
+          scheduleSave();
+        });
+      }
+      if (maxFreqInput) {
+        maxFreqInput.addEventListener("change", () => {
+          configState.maxFreq = Number(maxFreqInput.value);
+          scheduleSave();
+        });
+      }
+      if (freqToggle) {
+        freqToggle.addEventListener("change", () => {
+          configState.freqEnabled = freqToggle.checked;
+          scheduleSave();
+        });
+      }
+      if (medianRange && medianValue) {
+        const updateMedianLabel = () => {
+          medianValue.textContent = medianRange.value;
+          configState.medianSize = Number(medianRange.value);
+          scheduleSave();
+        };
+        medianRange.addEventListener("input", updateMedianLabel);
+        updateMedianLabel();
+      }
+      if (medianToggle) {
+        medianToggle.addEventListener("change", () => {
+          configState.medianEnabled = medianToggle.checked;
+          scheduleSave();
+        });
+      }
+      if (midiInput) {
+        midiInput.addEventListener("change", () => {
+          const file = midiInput.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            const buffer = reader.result;
+            if (buffer) {
+              loadMidiFromArrayBuffer(buffer);
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        });
+      }
+      if (midiTrackSelect) {
+        midiTrackSelect.addEventListener("change", () => {
+          midiTrackIndex = Number(midiTrackSelect.value || 0);
+          configState.midiTrackIndex = midiTrackIndex;
+          rebuildMidiNotes();
+          drawMidiLayer();
+          scheduleSave();
+        });
+      }
+      if (midiScaleRange && midiScaleValue) {
+        const updateMidiScale = () => {
+          const value = Number(midiScaleRange.value);
+          midiScaleValue.textContent = value.toFixed(1);
+          configState.midiScale = value;
+          rebuildMidiNotes();
+          drawMidiLayer();
+          scheduleSave();
+        };
+        midiScaleRange.addEventListener("input", updateMidiScale);
+        updateMidiScale();
+      }
+      if (midiTransposeRange && midiTransposeValue) {
+        const updateMidiTranspose = () => {
+          const value = Number(midiTransposeRange.value);
+          midiTransposeValue.textContent = String(value);
+          configState.midiTranspose = value;
+          rebuildMidiNotes();
+          drawMidiLayer();
+          scheduleSave();
+        };
+        midiTransposeRange.addEventListener("input", updateMidiTranspose);
+        updateMidiTranspose();
+      }
+      if (toggleSettingsBtn && controlsEl) {
+        toggleSettingsBtn.addEventListener("click", () => {
+          const nextOpen = controlsEl.classList.contains("is-collapsed");
+          controlsEl.classList.toggle("is-collapsed", !nextOpen);
+          configState.settingsOpen = nextOpen;
+          scheduleSave();
+        });
+      }
+      startBtn.addEventListener("click", startCapture);
+      stopBtn.addEventListener("click", stopCapture);
+      window.addEventListener("resize", updateCanvases);
+      window.addEventListener("beforeunload", () => {
+        stopCapture();
+      });
+
+      loadConfig();
+      buildKeys();
+      updateCanvases();
+      refreshDevices();
+      navigator.mediaDevices?.addEventListener?.("devicechange", refreshDevices);
+    </script>
+  </body>
+</html>

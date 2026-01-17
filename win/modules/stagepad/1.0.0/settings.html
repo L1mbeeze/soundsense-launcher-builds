@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>StagePad — Настройки</title>
+  <link rel="stylesheet" href="styles/palette.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/settings.css">
+</head>
+<body>
+  <div class="titlebar">
+    <div class="window-title">StagePad — Настройки</div>
+    <div class="window-controls">
+      <button class="window-btn" data-window-action="minimize" title="Свернуть">─</button>
+      <button class="window-btn" data-window-action="toggle-maximize" title="Развернуть">□</button>
+      <button class="window-btn close" data-window-action="close" title="Закрыть">✕</button>
+    </div>
+  </div>
+  <div class="settings-shell">
+    <div class="settings-top">
+      <div class="settings-tabs" role="tablist">
+        <button class="tab-btn active" data-tab="audio" role="tab" aria-selected="true">Аудио</button>
+        <button class="tab-btn" data-tab="video" role="tab" aria-selected="false">Видео</button>
+        <button class="tab-btn" data-tab="controls" role="tab" aria-selected="false">Управление</button>
+      </div>
+      <button class="btn secondary" id="settingsCloseBtn">Закрыть</button>
+    </div>
+    <section class="settings-section">
+      <div id="settingsContent" class="tab-panel" role="tabpanel"></div>
+    </section>
+  </div>
+
+  <script type="module" src="scripts/settings.js"></script>
+</body>
+</html>

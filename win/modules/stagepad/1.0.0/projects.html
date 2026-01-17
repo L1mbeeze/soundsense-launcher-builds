@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>StagePad — Проекты</title>
+  <link rel="stylesheet" href="styles/palette.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/editor.css">
+  <link rel="stylesheet" href="styles/performance.css">
+</head>
+<body data-page="projects">
+  <div class="titlebar">
+    <div class="window-title">StagePad — Проекты</div>
+    <div class="window-controls">
+      <button class="window-btn" data-window-action="minimize" title="Свернуть">─</button>
+      <button class="window-btn" data-window-action="toggle-maximize" title="Развернуть">□</button>
+      <button class="window-btn close" data-window-action="close" title="Закрыть">✕</button>
+    </div>
+  </div>
+  <div class="app views">
+    <div id="projectsView" class="view">
+      <div class="header">
+
+        <div class="header-actions">
+          <div class="field">
+            <label for="projectSearch">Поиск</label>
+            <input id="projectSearch" type="text" placeholder="Название или описание" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="projectGroupFilter">Фильтр по группе</label>
+            <select id="projectGroupFilter">
+              <option value="">Все группы</option>
+            </select>
+          </div>
+          <button class="btn" id="btnCreate">Добавить проект</button>
+        </div>
+      </div>
+      <div id="projectsList"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalEditor" hidden>
+    <div class="modal">
+      <h3 id="modalTitle">Новый проект</h3>
+      <div class="field">
+        <label for="projectName">Название (поддерживает кириллицу, пробелы заменятся на _ в адресе)</label>
+        <input id="projectName" type="text" placeholder="Мой проект" autocomplete="off">
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="projectGroup">Группа проекта</label>
+          <input id="projectGroup" type="text" placeholder="Например, Тур, Лето, Отдел" autocomplete="off">
+          <p class="hint">Кириллица поддерживается, регистр не важен.</p>
+        </div>
+        <div class="field">
+          <label for="projectGroupSelect">Выбрать из существующих</label>
+          <select id="projectGroupSelect">
+            <option value="">Без группы</option>
+          </select>
+          <p class="hint">Список собирается из текущих проектов.</p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="projectDesc">Описание</label>
+        <textarea id="projectDesc" placeholder="Коротко о проекте" maxlength="90"></textarea>
+        <div class="field__counter" id="projectDescCounter"></div>
+      </div>
+      <div class="field">
+        <label for="projectInstruction">Инструкция</label>
+        <textarea id="projectInstruction" placeholder="Подробная инструкция для сцены" rows="5"></textarea>
+        <p class="hint">Можно вставлять много текста, поддерживается кириллица.</p>
+      </div>
+      <div class="field">
+        <label for="projectImage">Обложка проекта</label>
+        <div class="image-upload">
+          <input id="projectImage" type="file" accept="image/*">
+          <div class="image-thumb" id="projectImageThumb">
+            <span class="image-thumb__placeholder">Предпросмотр</span>
+          </div>
+        </div>
+        <div class="image-actions">
+          <button class="btn secondary small" id="projectImageConfigure" disabled>НАСТРОИТЬ</button>
+          <button class="btn ghost small" id="projectImageReset" disabled>Сбросить</button>
+        </div>
+        <p class="hint">Изображение будет скопировано в проект и сохранено вместе с настройками.</p>
+      </div>
+      <div class="error" id="modalError"></div>
+      <div class="modal__actions">
+        <button class="btn secondary" data-action="cancel">Отмена</button>
+        <button class="btn" data-action="save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalDelete" hidden>
+    <div class="modal">
+      <h3>Удалить проект?</h3>
+      <p id="deleteText"></p>
+      <div class="modal__actions">
+        <button class="btn secondary" data-action="cancel-delete">Отмена</button>
+        <button class="btn danger" data-action="confirm-delete">Удалить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="instructionModal" hidden>
+    <div class="modal modal--instruction">
+      <h3 id="instructionTitle">Инструкция</h3>
+      <div class="instruction-text" id="instructionText"></div>
+      <div class="modal__actions">
+        <button class="btn" data-action="instruction-close">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="escapeModal" hidden>
+    <div class="escape-menu">
+      <button class="btn" id="escapeSettingsBtn">Настройки</button>
+      <button class="btn" id="escapeMixerBtn">Микшер</button>
+      <button class="btn secondary" id="escapeCloseBtn">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="imageCropModal" hidden>
+    <div class="modal modal--wide">
+      <h3>Настройка обложки</h3>
+      <p class="muted">Целевой размер: 360x200 px. Используйте колесо мыши или ползунок для зума, перетаскивайте изображение.</p>
+      <div class="image-cropper">
+        <div class="image-cropper__viewport" id="imageCropViewport">
+          <img id="imageCropSource" alt="Обложка" draggable="false">
+          <div class="image-cropper__mask"></div>
+        </div>
+        <div class="image-cropper__side">
+          <div class="field">
+            <label for="imageCropZoom">Масштаб</label>
+            <input type="range" id="imageCropZoom" min="1" max="4" step="0.01" value="1">
+          </div>
+          <div class="image-cropper__buttons">
+            <button class="btn secondary small" id="imageCropZoomIn">+</button>
+            <button class="btn secondary small" id="imageCropZoomOut">-</button>
+            <button class="btn ghost small" id="imageCropReset">Сбросить</button>
+          </div>
+          <div class="image-cropper__preview">
+            <span class="image-cropper__preview-label">Предпросмотр 180x100</span>
+            <canvas id="imageCropPreview" width="180" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="modal__actions">
+        <button class="btn secondary" id="imageCropCancel">Отмена</button>
+        <button class="btn" id="imageCropApply">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="scripts/page-projects.js"></script>
+</body>
+</html>

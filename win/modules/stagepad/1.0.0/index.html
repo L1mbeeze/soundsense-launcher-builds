@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>StagePad</title>
+  <meta http-equiv="refresh" content="0; url=projects.html">
+  <script>
+    (function redirect() {
+      const params = new URLSearchParams(window.location.search);
+      const mode = (params.get("mode") || "").toLowerCase();
+      let target = "projects.html";
+      if (mode === "performance") {
+        target = "performance.html";
+      } else if (mode === "editor" || params.has("project")) {
+        target = "editor.html";
+      }
+      const qs = params.toString();
+      const href = qs ? `${target}?${qs}` : target;
+      window.location.replace(href);
+    })();
+  </script>
+</head>
+<body>
+  Перенаправление...
+</body>
+</html>

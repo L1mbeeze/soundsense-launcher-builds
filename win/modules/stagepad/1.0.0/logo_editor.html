@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>StagePad — Логотип</title>
+  <link rel="stylesheet" href="styles/palette.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/logo-editor.css">
+</head>
+<body data-page="logo-editor">
+  <div class="titlebar">
+    <div class="window-title">StagePad — Логотип</div>
+    <div class="window-controls">
+      <button class="window-btn" data-window-action="minimize" title="Свернуть">─</button>
+      <button class="window-btn" data-window-action="toggle-maximize" title="Развернуть">□</button>
+      <button class="window-btn close" data-window-action="close" title="Закрыть">✕</button>
+    </div>
+  </div>
+
+  <div class="app views">
+    <div class="view logo-editor">
+      <div class="logo-editor__header">
+        <div class="logo-editor__meta">
+          <div class="badge">Логотип</div>
+          <h1>Редактор обложки</h1>
+          <p id="logoProjectName">Проект не выбран</p>
+        </div>
+        <div class="logo-editor__actions">
+          <button class="btn ghost small" id="btnBack">← К проектам</button>
+        </div>
+      </div>
+
+      <div class="logo-editor__body">
+        <section class="logo-workspace" id="logoWorkspace">
+          <div class="logo-workspace__markers" aria-hidden="true"></div>
+          <div class="logo-guides" id="logoGuides" aria-hidden="true"></div>
+          <div class="logo-workspace__layers" id="logoLayers"></div>
+          <div class="logo-workspace__placeholder">
+            <div class="logo-workspace__title">Рабочая область</div>
+            <p>Здесь будет предпросмотр логотипа и настройка положения.</p>
+          </div>
+        </section>
+
+        <aside class="logo-panel">
+          <h3>Панель настроек</h3>
+          <div class="field">
+            <label for="logoFile">Изображение логотипа</label>
+            <input type="file" id="logoFile" accept="image/*" hidden>
+            <input type="file" id="logoReplaceInput" accept="image/*" hidden>
+            <button class="btn secondary small" id="logoChoose">Добавить изображения</button>
+            <button class="btn ghost small" id="logoAddText" type="button">Добавить текст</button>
+          </div>
+          <div class="logo-section" data-logo-section>
+            <button class="logo-section__toggle" type="button" id="logoLayerToggle" aria-expanded="true">
+              <span>Слои логотипа</span>
+              <span class="logo-section__chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="logo-section__body" id="logoLayerBody">
+              <div class="logo-layer-list" id="logoLayerList"></div>
+            </div>
+          </div>
+          <div class="logo-text-settings" id="logoTextSettings" hidden>
+            <h4>Текстовый слой</h4>
+            <div class="field">
+              <label for="logoTextContent">Текст</label>
+              <input type="text" id="logoTextContent" maxlength="120">
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="logoTextFont">Шрифт</label>
+                <select id="logoTextFont">
+                  <option value="Segoe UI">Segoe UI</option>
+                  <option value="Arial">Arial</option>
+                  <option value="Tahoma">Tahoma</option>
+                  <option value="Verdana">Verdana</option>
+                  <option value="Georgia">Georgia</option>
+                </select>
+                <input type="file" id="logoTextFontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
+                <button class="btn ghost small" id="logoTextFontAdd" type="button">Добавить шрифт</button>
+              </div>
+              <div class="field">
+                <label for="logoTextSize">Размер (px)</label>
+                <input type="number" id="logoTextSize" min="8" step="1">
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="logoTextColor">Цвет</label>
+                <input type="color" id="logoTextColor" value="#ffffff">
+              </div>
+              <div class="field">
+                <label for="logoTextStrokeColor">Обводка</label>
+                <input type="color" id="logoTextStrokeColor" value="#000000">
+              </div>
+            </div>
+            <div class="field">
+              <label for="logoTextStrokeWidth">Толщина обводки</label>
+              <input type="number" id="logoTextStrokeWidth" min="0" max="20" step="1" value="0">
+            </div>
+            <div class="field">
+              <label for="logoTextEffect">Эффект</label>
+              <select id="logoTextEffect">
+                <option value="none">Без эффекта</option>
+                <option value="shadow-dance">Shadow Dance</option>
+                <option value="melting">Melting</option>
+                <option value="matrix">Matrix</option>
+                <option value="masked">Masked</option>
+                <option value="spin-3d">Spin 3D</option>
+                <option value="neon">Neon</option>
+                <option value="shadow-follow">Shadow Follow</option>
+              </select>
+            </div>
+            <div class="logo-section" id="logoEffectSection">
+              <button class="logo-section__toggle" type="button" id="logoEffectToggle" aria-expanded="true">
+                <span>Настройки эффекта</span>
+                <span class="logo-section__chevron" aria-hidden="true">⌄</span>
+              </button>
+              <div class="logo-section__body" id="logoEffectBody">
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="logoEffectColorA">Цвет A</label>
+                    <input type="color" id="logoEffectColorA" value="#00ff66">
+                  </div>
+                  <div class="field">
+                    <label for="logoEffectColorB">Цвет B</label>
+                    <input type="color" id="logoEffectColorB" value="#00d4ff">
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="logoEffectSpeed">Скорость анимации (с)</label>
+                  <input type="range" id="logoEffectSpeed" min="0.5" max="10" step="0.1" value="2">
+                  <div class="chip" id="logoEffectSpeedValue">2s</div>
+                </div>
+                <div class="field" id="logoEffectRainField" hidden>
+                  <label for="logoEffectRainOpacity">Плотность дождя</label>
+                  <input type="range" id="logoEffectRainOpacity" min="0" max="0.6" step="0.05" value="0.2">
+                  <div class="chip" id="logoEffectRainValue">0.2</div>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="inline">
+                <input type="checkbox" id="logoTextItalic">
+                Наклон (italic)
+              </label>
+            </div>
+            <div class="field">
+              <label for="logoTextCurve">Изгиб</label>
+              <div class="logo-scale-row">
+                <input type="range" id="logoTextCurve" min="-200" max="200" step="1" value="0">
+                <span class="chip" id="logoTextCurveValue">0</span>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="logoScale">Масштаб</label>
+            <div class="logo-scale-row">
+              <input type="range" id="logoScale" min="5" max="200" value="100">
+              <span class="chip" id="logoScaleValue">100%</span>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="logoWidth">Ширина (px)</label>
+              <div class="logo-size-row">
+                <input type="number" id="logoWidth" min="1" step="1">
+                <button class="btn ghost small" id="logoWidthReset" type="button">Сброс</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="logoHeight">Высота (px)</label>
+              <div class="logo-size-row">
+                <input type="number" id="logoHeight" min="1" step="1">
+                <button class="btn ghost small" id="logoHeightReset" type="button">Сброс</button>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="logoAlign">Позиция</label>
+            <select id="logoAlign">
+              <option value="center">Центр</option>
+              <option value="top">Сверху</option>
+              <option value="bottom">Снизу</option>
+              <option value="left">Слева</option>
+              <option value="right">Справа</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="inline">
+              <input type="checkbox" id="logoSafeZone">
+              Показывать безопасные зоны
+            </label>
+          </div>
+          <div class="field">
+            <label>Проект</label>
+            <div class="logo-project-chip" id="logoProjectId">—</div>
+          </div>
+          <div class="logo-panel__actions">
+            <button class="btn secondary" id="logoReset" disabled>Сбросить</button>
+            <button class="btn" id="logoSave" disabled>Сохранить</button>
+          </div>
+          <p class="hint">Редактор пока в разработке.</p>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="scripts/logo-editor.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+.settings-shell {
+  max-width: 960px;
+  margin: 32px auto;
+  padding: 0 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-section {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.settings-section h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.settings-card {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+.settings-tabs {
+  display: inline-flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.tab-btn {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.tab-btn.active {
+  background: linear-gradient(145deg, rgba(0, 255, 166, 0.16), rgba(0, 0, 0, 0.2));
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 255, 166, 0.25);
+}
+
+.tab-panel {
+  min-height: 120px;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.settings-note {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+select[data-missing="true"] {
+  border-color: rgba(255, 108, 133, 0.65);
+  box-shadow: 0 0 0 1px rgba(255, 108, 133, 0.35);
+}

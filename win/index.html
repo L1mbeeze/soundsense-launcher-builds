@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SoundSense Launcher</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="noise"></div>
+
+  <!-- Боковое меню -->
+  <div id="sidebar">
+    <h2>SoundSense</h2>
+
+    <div class="menu-item auth-guest" data-page="auth">Авторизация</div>
+    <div class="menu-item auth-only" data-page="profile">Профиль</div>
+    <div class="menu-item" data-page="home">Главная</div>
+    <div class="menu-item" data-page="games">Программы</div>
+    <div class="menu-item" data-page="news">Новости</div>
+    <div class="menu-item" data-page="settings">Настройки</div>
+  </div>
+
+  <!-- Центральная зона -->
+  <div id="main" style="background-image: url('Assets/bg2.png');">
+    <div id="main-overlay">
+      <div class="window-bar" id="window-bar">
+        <div class="window-title" data-load-page="home">SoundSense Launcher</div>
+        <div class="window-controls">
+          <button class="window-btn" data-window-action="minimize">─</button>
+          <button class="window-btn" data-window-action="toggle-maximize">□</button>
+          <button class="window-btn close" data-window-action="close">✕</button>
+        </div>
+      </div>
+      <div id="page-container"></div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+
+</body>
+</html>
