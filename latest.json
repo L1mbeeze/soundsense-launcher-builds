@@ -1,25 +1,26 @@
 {
-  "version": "0.01",
-  "tag": "win_0.01",
-  "base_url": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/",
-  "manifest": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/manifest.json",
-  "modules": {
-    "localserver": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/localserver-manifest.json",
-    "stagepad": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/stagepad-manifest.json",
-    "videofon": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/videofon-manifest.json",
-    "VoiceNote": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/VoiceNote-manifest.json"
-  }
-}
-
-{
-  "version": "0.01",
-  "tag": "mac_0.01",
-  "base_url": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/",
-  "manifest": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/manifest.json",
-  "modules": {
-    "localserver": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/localserver-manifest.json",
-    "stagepad": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/stagepad-manifest.json",
-    "videofon": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/videofon-manifest.json",
-    "VoiceNote": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/VoiceNote-manifest.json"
+  "win": {
+    "version": "0.01",
+    "tag": "win_0.01",
+    "base_url": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/",
+    "manifest": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/manifest.json",
+    "modules": {
+      "localserver": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/localserver-manifest.json",
+      "stagepad": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/stagepad-manifest.json",
+      "videofon": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/videofon-manifest.json",
+      "VoiceNote": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/VoiceNote-manifest.json"
+    }
+  },
+  "mac": {
+    "version": "0.01",
+    "tag": "mac_0.01",
+    "base_url": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/",
+    "manifest": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/manifest.json",
+    "modules": {
+      "localserver": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/localserver-manifest.json",
+      "stagepad": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/stagepad-manifest.json",
+      "videofon": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/videofon-manifest.json",
+      "VoiceNote": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/mac_0.01/VoiceNote-manifest.json"
+    }
   }
 }
