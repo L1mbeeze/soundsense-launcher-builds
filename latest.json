@@ -9,6 +9,7 @@
       "stagepad": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/stagepad-manifest.json",
       "videofon": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/videofon-manifest.json",
       "VoiceNote": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/VoiceNote-manifest.json"
+      "PromptFlow": "https://github.com/L1mbeeze/soundsense-launcher-builds/releases/download/win_0.01/PromptFlow-manifest.json"
     }
   },
   "mac": {
